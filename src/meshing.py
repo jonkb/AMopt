@@ -18,9 +18,12 @@ def x2mesh(x, tag, dim="cube", out_format="mesh"):
     
     The following files will be created:
         f"{tag}.stl" (Intermediate)
+        tmp_stl2msh.geo (GMSH code)
         f"{tag}.msh" (Intermediate)
         [if out_format == "mesh"] f"{tag}.mesh" (Final Output)
         [if out_format == "vtk"] f"{tag}.vtk" (Final Output)
+        TODO: make it possible to specify a /tmp/ directory to save these
+            temporary files so the /src/ directory doesn't get cluttered.
     
     Parameters
     ----------
@@ -362,4 +365,4 @@ if __name__ == "__main__":
     # Test meshing a hyperboloid
     x0 = x0_hyperboloid()
     #x0 = x0_bubbles()
-    x2mesh(x0, "hyprbA", out_format="mesh")
+    x2mesh(x0, "hyprb", out_format="mesh")
