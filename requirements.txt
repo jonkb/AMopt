@@ -1,0 +1,9 @@
+# This file can be used to pip install all dependencies as follows
+#   python -m pip install -r requirements.txt
+# TODO: IN PROGRESS
+
+numpy
+numpy-stl
+scikit-image # For marching cubes algorithm
+sfepy # FEA
+gmsh # Python interface to GMSH is not currently used
