@@ -13,8 +13,7 @@ def x2mesh(x, tag, dim="cube", out_format="mesh"):
     2. Threshold rho to create an isosurface, surf: surf = rho2isosurf(rho)
     3. Convert surf to an stl: isosurf2stl(surf)
     4. Convert that stl into a 3D volume & into a mesh with gmsh: stl2msh
-    5. Convert that gmsh mesh (msh file) to a SfePy mesh file
-        NOTE / TODO: Could also convert to vtk
+    5. Convert that gmsh mesh (msh file) to a SfePy mesh or vtk file
     
     The following files will be created:
         f"{tag}.stl" (Intermediate)
@@ -358,11 +357,35 @@ def x0_hyperboloid(dim=(10,10,10)):
     # print(rho)
     return rho.flatten()
 
+def x0_cube(dim=(10,10,10)):
+    """ Generate an x-vector for a hyperboloid as an initial guess
+    """
+    h = 1
+    x_lims = (-10, 10)
+    y_lims = (-10, 10)
+    z_lims = (-10, 10)
+    # This method places a point at either limit. Alternatively, I could place
+    #   each point at the center of a box -- TODO
+    Lx = max(x_lims) - min(x_lims)
+    Ly = max(x_lims) - min(x_lims)
+    Lz = max(x_lims) - min(x_lims)
+    hx = Lx / (dim[0] - 1)
+    hy = Ly / (dim[1] - 1)
+    hz = Lz / (dim[2] - 1)
+    x = np.arange(x_lims[0], x_lims[1]+hx/2, hx)
+    y = np.arange(y_lims[0], y_lims[1]+hy/2, hy)
+    z = np.arange(z_lims[0], z_lims[1]+hz/2, hz)
+    X, Y, Z = np.meshgrid(x, y, z)
+    # https://mathworld.wolfram.com/One-SheetedHyperboloid.html
+    rho = np.ones_like(Z)
+    return rho.flatten()
+
 if __name__ == "__main__":
 
     print("TESTING MESHING")
 
     # Test meshing a hyperboloid
-    x0 = x0_hyperboloid()
+    # x0 = x0_hyperboloid()
+    x0 = x0_cube()
     #x0 = x0_bubbles()
-    x2mesh(x0, "hyprb", out_format="mesh")
+    x2mesh(x0, "cube", out_format="mesh")
