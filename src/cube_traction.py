@@ -119,8 +119,8 @@ def define(approx_order=1):
     from sfepy import data_dir
 
     # filename_mesh = data_dir + '/meshes/3d/block.mesh'
-    # filename_mesh = "./cube.mesh"
-    filename_mesh = "./hyprb.mesh"
+    filename_mesh = "./cube.mesh"
+    # filename_mesh = "./hyprb.mesh"
 
     options = {
         'nls' : 'newton',
