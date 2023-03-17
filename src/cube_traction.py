@@ -63,7 +63,8 @@ def verify_tractions(out, problem, state, extend=False):
     Verify that the inner surface tractions correspond to the load applied
     to the external surface.
     """
-    from sfepy.mechanics.tensors import get_full_indices
+    import numpy as np
+    from sfepy.mechanics.tensors import get_full_indices, get_von_mises_stress
     from sfepy.discrete import Material, Function
 
     load_force = problem.evaluate(
@@ -71,6 +72,44 @@ def verify_tractions(out, problem, state, extend=False):
         'ev_integrate_mat.2.Top(load.val, u)'
     )
     output('surface load force:', load_force)
+
+    # Calculate max stress and its location
+
+    # Calculate the Cauchy stress tensor
+    stress = problem.evaluate(
+        'ev_cauchy_stress.i.Omega(solid.D, u)',
+        mode='el_avg',
+        verbose=False,
+    )
+
+    # Calculate the von Mises stress
+    von_mises_stress = get_von_mises_stress(stress.squeeze())
+
+    # Find the maximum von Mises stress and its location
+    max_stress = von_mises_stress.max()
+    max_stress_idx = nm.argmax(von_mises_stress)
+
+    # Get the centroid of the element with the maximum stress
+    domain = problem.domain
+    mesh = domain.mesh
+
+    # Assuming that the mesh has only one element group
+    element_group = mesh.descs[0]
+    conn = mesh.get_conn(element_group)
+    coors = mesh.coors
+
+    # Calculate centroids
+    centroids = coors[conn].sum(axis=1) / conn.shape[1]
+    max_stress_location = centroids[max_stress_idx]
+
+    output("Maximum von Mises stress: {:.2f}".format(max_stress))
+    output("Location of maximum stress: {}".format(max_stress_location))
+
+    # stress_mag = np.sqrt(np.sum(von_mises_stress**2, axis=1))
+    
+    # data_to_save = np.hstack((centroids, stress.reshape(-1, 6)))
+    # header = "x, y, z, s11, s12, s13, s21, s22, s23, s31, s32, s33"
+    # np.savetxt("stress_and_centroids.csv", data_to_save, delimiter=",", header=header)
 
     def eval_force(region_name):
         strain = problem.evaluate(
@@ -205,3 +244,5 @@ def define(approx_order=1):
     }
 
     return locals()
+
+
