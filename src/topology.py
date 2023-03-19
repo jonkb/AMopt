@@ -11,10 +11,10 @@ from util import *
 PLOT = True
 
 x0 = x0_cube((10,10,10)) # initial guess
-lb = 60 # MPa (yield strength of PLA)
-ub = np.inf # MPa 
+lb = -np.inf
+ub = 0.0 
 theConstraints = NonlinearConstraint(con_func, lb, ub)
-theBounds = [(0, np.inf)]
+theBounds = [(0, 1)]
 theOptions = {'maxiter':1000}
 optimality = []
 def callback(xk, res):
