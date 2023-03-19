@@ -51,6 +51,12 @@ from sfepy.base.base import output
 # from sfepy.mechanics.matcoefs import stiffness_from_lame
 from sfepy.mechanics.matcoefs import stiffness_from_youngpoisson
 
+import settings
+# Used to find the top and bottom of the cube
+zmin_eps = 1.00000001
+zmax_eps = (0.99999999 + 2*settings.face_thickness*settings.voxel_dim[2] 
+    + settings.side_lengths[2])
+
 def linear_tension(ts, coor, mode=None, **kwargs):
     if mode == 'qp':
         # Pressure: 0.25 MPa
@@ -196,10 +202,11 @@ def define(approx_order=1):
         # 'Middle' : ('vertices in (x > -1e-10) & (x < 1e-10)', 'facet', 'Rhalf'),
         # 'Rhalf' : 'vertices in x > -1e-10',
         # 'Right' : ('vertices in (x > 4.99)', 'facet'),
-        'Bot' : ('vertices in (z < 1.00000001)', 'facet'),
+
+        'Bot' : (f'vertices in (z < {zmin_eps})', 'facet'),
         # NOTE: This is hard-coded. It will change if the cube dimensions change
         #   Which they *will* if the face thickness changes.
-        'Top' : ('vertices in (z > 24.99999999)', 'facet'),
+        'Top' : (f'vertices in (z > {zmax_eps})', 'facet'),
     }
 
     ebcs = {
