@@ -24,3 +24,5 @@ face_thickness=1
 
 # Material density (PLA)
 rho = .0014 #g/mm3
+
+stress_limit = 50.0 # MPa - The average compressive stress limit I could find was 40-60 MPa

@@ -6,16 +6,24 @@ import obj_func as of
 from meshing import x2mesh, x0_cube
 from subprocess import run, call 
 from util import *
+import settings
 
 
 def con_func(x):
     """
     Constraint function
     """
-    stress_limit = 40.0 # MPa - The average compressive stress limit I could find was 40-60 MPa
+    stress_limit = settings.stress_limit
 
-    # Pull max stress from obj_func
-    max_stress = of.obj_func(x)
+    # Create the mesh
+    x2mesh(x, "cube", out_format="mesh")
+
+    # Evaluate mesh in FEA
+    results = run(["sfepy-run", "cube_traction.py"], capture_output=False, text=True)
+    vprnt(results.stdout)
+
+    # Pull max stress from max_stress.txt
+    max_stress = np.loadtxt('max_stress.txt', dtype=float)
     
     g0 = np.zeros(1)
     g0[0] = max_stress - stress_limit

@@ -93,6 +93,8 @@ def verify_tractions(out, problem, state, extend=False):
 
     # Find the maximum von Mises stress and its location
     max_stress = von_mises_stress.max()
+    with open('max_stress.txt', 'w') as f:
+        f.write(str(max_stress))
     max_stress_idx = nm.argmax(von_mises_stress)
 
     # Get the centroid of the element with the maximum stress

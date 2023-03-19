@@ -12,26 +12,15 @@ def obj_func(x):
     """
     Objective function
     """
-    times = tic()
-
-    # The following is for the stress -- the constraints
-    # # Create the mesh
-    # x2mesh(x, "cube", out_format="mesh")
-
-    # # Evaluate mesh in FEA
-    # results = run(["sfepy-run", "cube_traction.py"], capture_output=False, text=True)
-    # vprnt(results.stdout)
     
     # Calculate mass from x
     rho = settings.rho
     num_voxels = np.prod(settings.resolution) # Nx*Ny*Nz
     volume_voxel = np.prod(settings.voxel_dim) # Volume per voxel = hx*hy*hz
-    mass = np.sum(rho*volume_voxel*num_voxels)
+    mass = np.sum(rho*volume_voxel*num_voxels*x[0])
     vprnt(f"Volume of voxel: {volume_voxel}")
     vprnt(f"Number of voxels: {num_voxels}")
     vprnt(f"Mass: {mass} grams")
-
-    toc(times, f"Total obj_func eval time", total=True)
 
     return mass
 
