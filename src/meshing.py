@@ -4,6 +4,7 @@ import sfepy.mesh.mesh_generators as femg # Used for creating voxel mesh
 from skimage import measure as skim
 from stl.mesh import Mesh as npstlMesh
 import gmsh # Used in stl2msh_py
+import settings
 from util import vprnt, tic, toc
 
 def x2mesh(x, tag, dim="cube", out_format="mesh"):
@@ -80,7 +81,7 @@ def x2mesh(x, tag, dim="cube", out_format="mesh"):
     # Report total time
     toc(times, f"Total x->{out_format}", total=True)
 
-def rho2isosurf(rho, rho_cutoff=0.5, spacing=(2.,2.,2.), face_thickness=1):
+def rho2isosurf(rho, rho_cutoff=0.5):
     """ Take a discrete density function rho and convert it to an isosurface
         by thresholding at rho_cutoff. Also adds the top and bottom faces of 
         the cube.
@@ -93,11 +94,6 @@ def rho2isosurf(rho, rho_cutoff=0.5, spacing=(2.,2.,2.), face_thickness=1):
         This array should not include the top and bottom faces
     rho_cutoff (float): Cutoff threshold for determining whether the density 
         is high enough that we should place material there.
-    spacing (iterable, length 3): spacing = (dx, dy, dz)
-        This determines the scaling from grid indices to physical units.
-    face_thickness (int): Thickness of the top and bottom faces to be added,
-        in number of voxels. Minimum is 1. This limitation is because the 
-        marching cubes algorithm doesn't support variable element spacing.
 
     Returns
     -------
@@ -107,6 +103,7 @@ def rho2isosurf(rho, rho_cutoff=0.5, spacing=(2.,2.,2.), face_thickness=1):
     """
 
     ## Modify density function to include faces & empty "walls"
+    face_thickness = settings.face_thickness
     rho_shape = np.array(rho.shape)
     # Add space for cube walls & top & bottom
     rho_shape[0] += 2
@@ -120,11 +117,8 @@ def rho2isosurf(rho, rho_cutoff=0.5, spacing=(2.,2.,2.), face_thickness=1):
     
     ## Run marching cubes
     verts, faces, normals, values = skim.marching_cubes(rho_full, rho_cutoff, 
-        spacing=spacing)
-    # NOTE: The units for position here are all integer indexes... I think.
-    #   May need to convert back -- TODO
+        spacing=settings.voxel_dim)
     # https://scikit-image.org/docs/dev/api/skimage.measure.html#marching-cubes
-    # There's an option for that (spacing). Also play with the other options.
     #   Could try allow_degenerate = False, but it'd probably slow it down
     #       with no benefits to us, unless GMSH is choking
     #   method: {‘lewiner’, ‘lorensen’} -- IDK which is better / faster
@@ -143,11 +137,11 @@ def isosurf2stl(isosurf, stl_fname):
     cm.vectors = verts[faces[:,:], :]
     cm.save(stl_fname)
 
-def rho2mesh(rho, mesh_fname, spacing=(2.,2.,2.)):
+def rho2mesh(rho, mesh_fname):
     # This method works, but it's boxy
     # Use gen_mesh_from_voxels
     vprnt("Generate boxy mesh from voxels")
-    vmesh = femg.gen_mesh_from_voxels(rho, spacing)
+    vmesh = femg.gen_mesh_from_voxels(rho, settings.voxel_dim)
     vmesh.write(mesh_fname)
     vprnt(vmesh)
     vprnt(f"Saved to {mesh_fname}")
@@ -329,25 +323,25 @@ def cylinder_isosurf():
     isosurf = [verts, faces, normals, values]
     return isosurf
 
-def x0_hyperboloid(dim=(10,10,10)):
+def XYZ_grid():
+    """ Generate an XYZ meshgrid for the density function based on the settings
+    """
+    L = settings.side_lengths
+    N = settings.resolution
+    h = settings.voxel_dim
+
+    # Place a point at the center of each voxel. Then the density function is 
+    #   correctly interpreted as the average density in that voxel.
+    x = np.linspace(0, L[0]-h[0], N[0]) + h[0]/2
+    y = np.linspace(0, L[1]-h[1], N[1]) + h[1]/2
+    z = np.linspace(0, L[2]-h[2], N[2]) + h[2]/2
+    X, Y, Z = np.meshgrid(x, y, z)
+    return X, Y, Z
+
+def x0_hyperboloid():
     """ Generate an x-vector for a hyperboloid as an initial guess
     """
-    h = 1
-    x_lims = (-10, 10)
-    y_lims = (-10, 10)
-    z_lims = (-10, 10)
-    # This method places a point at either limit. Alternatively, I could place
-    #   each point at the center of a box -- TODO
-    Lx = max(x_lims) - min(x_lims)
-    Ly = max(x_lims) - min(x_lims)
-    Lz = max(x_lims) - min(x_lims)
-    hx = Lx / (dim[0] - 1)
-    hy = Ly / (dim[1] - 1)
-    hz = Lz / (dim[2] - 1)
-    x = np.arange(x_lims[0], x_lims[1]+hx/2, hx)
-    y = np.arange(y_lims[0], y_lims[1]+hy/2, hy)
-    z = np.arange(z_lims[0], z_lims[1]+hz/2, hz)
-    X, Y, Z = np.meshgrid(x, y, z)
+    X, Y, Z = XYZ_grid()
     a = Lx / 4 # a = skirt radius
     c = Lz / 4 * 1.25
     # https://mathworld.wolfram.com/One-SheetedHyperboloid.html
@@ -357,25 +351,10 @@ def x0_hyperboloid(dim=(10,10,10)):
     # print(rho)
     return rho.flatten()
 
-def x0_cube(dim=(10,10,10)):
-    """ Generate an x-vector for a hyperboloid as an initial guess
+def x0_cube():
+    """ Generate an x-vector for a cube as an initial guess
     """
-    h = 1
-    x_lims = (-10, 10)
-    y_lims = (-10, 10)
-    z_lims = (-10, 10)
-    # This method places a point at either limit. Alternatively, I could place
-    #   each point at the center of a box -- TODO
-    Lx = max(x_lims) - min(x_lims)
-    Ly = max(x_lims) - min(x_lims)
-    Lz = max(x_lims) - min(x_lims)
-    hx = Lx / (dim[0] - 1)
-    hy = Ly / (dim[1] - 1)
-    hz = Lz / (dim[2] - 1)
-    x = np.arange(x_lims[0], x_lims[1]+hx/2, hx)
-    y = np.arange(y_lims[0], y_lims[1]+hy/2, hy)
-    z = np.arange(z_lims[0], z_lims[1]+hz/2, hz)
-    X, Y, Z = np.meshgrid(x, y, z)
+    X, Y, Z = XYZ_grid()
     # https://mathworld.wolfram.com/One-SheetedHyperboloid.html
     rho = np.ones_like(Z)
     return rho.flatten()

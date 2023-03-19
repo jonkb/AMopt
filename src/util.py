@@ -1,15 +1,13 @@
 """ Utility functions
 """
 import time
-
-# Settings
-verbose = True
+import settings
 
 def vprnt(*args):
     """ Thin wrapper around the standard print function
-    Only prints if verbose == True
+    Only prints if settings.verbose == True
     """
-    if verbose:
+    if settings.verbose:
         print(*args)
 
 def tic():
