@@ -14,7 +14,7 @@ verbose = True
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-resolution = np.array((10, 10, 10))
+resolution = np.array((3, 3, 3))
 # voxel dimensions
 voxel_dim = side_lengths / resolution
 # face_thickness (int): Thickness of the top and bottom faces to be added, in

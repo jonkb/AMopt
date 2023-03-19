@@ -44,7 +44,7 @@ def x2mesh(x, tag, dim="cube", out_format="mesh"):
     N = x.size
     if dim == "cube":
         nx = np.cbrt(N)
-        assert nx % 1 == 0, ("For dim='cube', the length of x must be a cubic"
+        assert np.round(nx, 8) % 1 == 0, ("For dim='cube', the length of x must be a cubic"
             f" number. N = {N}")
         nx = int(nx)
         rho = x.reshape((nx, nx, nx))
@@ -342,13 +342,19 @@ def x0_hyperboloid():
     """ Generate an x-vector for a hyperboloid as an initial guess
     """
     X, Y, Z = XYZ_grid()
-    a = Lx / 4 # a = skirt radius
-    c = Lz / 4 * 1.25
+    a = settings.side_lengths[0] / 4 # a = skirt radius
+    c = settings.side_lengths[2] / 4 * 1.25
     # https://mathworld.wolfram.com/One-SheetedHyperboloid.html
-    hyperboloid = X**2/a**2 + Y**2/a**2 - Z**2/c**2
+    x_mid = settings.side_lengths[0]/2
+    y_mid = settings.side_lengths[1]/2
+    z_mid = settings.side_lengths[2]/2
+    hyperboloid = (X-x_mid)**2/a**2 + (Y-y_mid)**2/a**2 - (Z-z_mid)**2/c**2
     # Negative because we want material inside, not outside
     rho = 1.5 - hyperboloid # assuming rho threshold = 0.5
     # print(rho)
+    # set max & min rho
+    rho[rho > 1] = 1
+    rho[rho < 0] = 0
     return rho.flatten()
 
 def x0_cube():

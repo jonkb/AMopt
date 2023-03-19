@@ -53,9 +53,9 @@ from sfepy.mechanics.matcoefs import stiffness_from_youngpoisson
 
 import settings
 # Used to find the top and bottom of the cube
-zmin_eps = 1.00000001
-zmax_eps = (0.99999999 + 2*settings.face_thickness*settings.voxel_dim[2] 
-    + settings.side_lengths[2])
+zmin_eps = 0.00000001 + settings.voxel_dim[2]/2
+zmax_eps = (-0.00000001 + settings.voxel_dim[2]/2 + settings.side_lengths[2]
+    + 2*settings.face_thickness*settings.voxel_dim[2])
 
 def linear_tension(ts, coor, mode=None, **kwargs):
     if mode == 'qp':
@@ -72,6 +72,8 @@ def verify_tractions(out, problem, state, extend=False):
     import numpy as np
     from sfepy.mechanics.tensors import get_full_indices, get_von_mises_stress
     from sfepy.discrete import Material, Function
+
+    tag = problem.ofn_trunk
 
     load_force = problem.evaluate(
         # 'ev_integrate_mat.2.Right(load.val, u)'
@@ -93,7 +95,7 @@ def verify_tractions(out, problem, state, extend=False):
 
     # Find the maximum von Mises stress and its location
     max_stress = von_mises_stress.max()
-    with open('max_stress.txt', 'w') as f:
+    with open(f'{tag}_max_stress.txt', 'w') as f:
         f.write(str(max_stress))
     max_stress_idx = nm.argmax(von_mises_stress)
 
@@ -161,12 +163,13 @@ def verify_tractions(out, problem, state, extend=False):
 
     return out
 
-def define(approx_order=1):
+def define(approx_order=1, tag="tmp"):
     """Define the problem to solve."""
     from sfepy import data_dir
 
     # filename_mesh = data_dir + '/meshes/3d/block.mesh'
-    filename_mesh = "./cube.mesh"
+    # filename_mesh = "./cube.mesh"
+    filename_mesh = f"./{tag}.mesh"
     # filename_mesh = "./hyprb.mesh"
 
     options = {

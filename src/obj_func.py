@@ -17,7 +17,7 @@ def obj_func(x):
     rho = settings.rho
     num_voxels = np.prod(settings.resolution) # Nx*Ny*Nz
     volume_voxel = np.prod(settings.voxel_dim) # Volume per voxel = hx*hy*hz
-    mass = np.sum(rho*volume_voxel*num_voxels*x[0])
+    mass = np.sum(rho*volume_voxel*num_voxels*x)
     vprnt(f"Volume of voxel: {volume_voxel}")
     vprnt(f"Number of voxels: {num_voxels}")
     vprnt(f"Mass: {mass} grams")
