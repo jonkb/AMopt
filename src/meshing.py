@@ -164,7 +164,7 @@ def stl2msh(fname_stl, fname_msh):
         fg.write(geo)
     # Run that geo file
     #subprocess.run(["gmsh", fname_geo, "-3"])
-    subprocess.run(["gmsh", fname_geo, "-"])
+    subprocess.run(["gmsh", fname_geo, "-"], stdout=settings.terminal_output, stderr=settings.terminal_output)
 
 def stl2msh_py(fname_stl, fname_msh):
     # Using python GMSH interface.
@@ -218,7 +218,7 @@ def msh2sfepy(fname_msh, fname_sfepy):
 
     E.g. $ sfepy-convert -m -d 3 hyprb.msh hyprb.vtk
     """
-    subprocess.run(["sfepy-convert", "-d 3", fname_msh, fname_sfepy])
+    subprocess.run(["sfepy-convert", "-d 3", fname_msh, fname_sfepy], stdout=settings.terminal_output, stderr=settings.terminal_output)
 
 def cube_isosurf():
     # Sinusoidal --> bubbles
