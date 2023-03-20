@@ -8,7 +8,7 @@ from subprocess import run, call
 from util import *
 import settings
 
-call_num = 0
+g_calls = 0
 
 def con_func(x):
     """
@@ -17,9 +17,10 @@ def con_func(x):
     stress_limit = settings.stress_limit
 
     # Count call numbers to make unique filenames
-    global call_num
-    tag = f"x{call_num:06d}"
-    call_num += 1
+    global g_calls
+    tag = f"x{g_calls:06d}"
+    g_calls += 1
+    vprnt(f"g_calls: {g_calls}")
 
     # Save the x vector to file (FOR DEBUGGING)
     np.savetxt(f"{tag}.txt", x)
@@ -28,7 +29,7 @@ def con_func(x):
     x2mesh(x, tag, out_format="mesh")
 
     # Evaluate mesh in FEA
-    results = run(["sfepy-run", "cube_traction.py", "-d", f"tag='{tag}'"], capture_output=False, text=True)
+    results = run(["sfepy-run", "cube_traction.py", "-d", f"tag='{tag}'"], stdout=settings.terminal_output, stderr=settings.terminal_output)
     # vprnt(results.stdout)
 
     # Pull max stress from max_stress.txt

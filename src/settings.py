@@ -3,11 +3,15 @@ This file is intended to be imported as a module by the other python files so
 they all have access to the same global settings.
 """
 import numpy as np
+from subprocess import DEVNULL
 
 ## General settings
 # Whether to print to console when calling the util.vprnt function
 verbose = True
+terminal_output = DEVNULL
+
 # TODO: Temporary folder path
+
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation
@@ -25,3 +29,4 @@ face_thickness=1
 # Material density (PLA)
 rho = .0014 #g/mm3
 stress_limit = 50.0 # MPa - The average compressive stress limit I could find was 40-60 MPa
+

@@ -7,12 +7,16 @@ from subprocess import run, call
 from util import *
 import settings
 
+f_calls = 0
+
 # Define the objective function
 def obj_func(x):
     """
     Objective function
     """
-    
+    global f_calls
+    f_calls += 1
+    vprnt(f"g_calls: {f_calls}")
     # Calculate mass from x
     rho = settings.rho
     num_voxels = np.prod(settings.resolution) # Nx*Ny*Nz
