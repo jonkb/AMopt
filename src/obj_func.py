@@ -16,7 +16,7 @@ def obj_func(x):
     """
     global f_calls
     f_calls += 1
-    vprnt(f"g_calls: {f_calls}")
+    vprnt(f"f_calls: {f_calls}")
     # Calculate mass from x
     rho = settings.rho
     num_voxels = np.prod(settings.resolution) # Nx*Ny*Nz
