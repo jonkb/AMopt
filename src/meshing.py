@@ -3,7 +3,7 @@ import numpy as np
 import sfepy.mesh.mesh_generators as femg # Used for creating voxel mesh
 from skimage import measure as skim
 from stl.mesh import Mesh as npstlMesh
-import gmsh # Used in stl2msh_py
+#import gmsh # Used in stl2msh_py
 import settings
 from util import vprnt, tic, toc
 

@@ -1,3 +1,10 @@
+
+import os
+# Set environment variables to limit multithreading
+# This must be done before importing np
+threads = "24"
+os.environ["OPENBLAS_NUM_THREADS"] = threads
+
 from scipy.optimize import minimize, NonlinearConstraint
 import numpy as np
 import matplotlib.pyplot as plt
