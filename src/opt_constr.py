@@ -25,6 +25,8 @@ def ip_min(f, g, x0, bounds=None, maxit=10, xtol=1e-3, rho=0.25, mu0=1):
     xi = x0
     it = 0
     dx = xtol * 10
+    # TODO: xtol is a bad convergence metric for this.
+    # Constrained optimality would be better.
     while it < maxit and dx > xtol:
         # Solve subproblem
         f_hat = lambda x: f_hat_ip(f, g, x, mu)
