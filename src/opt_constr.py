@@ -18,19 +18,19 @@ def f_hat_ip(f, g, x, mu):
         penalty = -mu*np.sum(np.log(-gi))
     return fi + penalty
 
-def ip_min(f, g, x0, bounds=None, maxit=10, xtol=1e-3, rho=0.25, mu0=1):
+def ip_min(f, g, x0, bounds=None, maxit=8, xtol=1e-3, rho=0.25, mu0=1):
     # Interior penalty method
     
     mu = mu0
     xi = x0
     it = 0
-    dx = xtol * 10
+    dx = xtol * 2
     # TODO: xtol is a bad convergence metric for this.
     # Constrained optimality would be better.
     while it < maxit and dx > xtol:
         # Solve subproblem
         f_hat = lambda x: f_hat_ip(f, g, x, mu)
-        res = spo.minimize(f_hat, xi, bounds=bounds, tol=1e-3)
+        res = spo.minimize(f_hat, xi, bounds=bounds, tol=1e-2)
         print(f"Iteration {it}: \n{res}")
         # Set up for next iteration
         dx = np.linalg.norm(xi - res.x)

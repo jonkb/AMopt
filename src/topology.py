@@ -2,8 +2,12 @@
 import os
 # Set environment variables to limit multithreading
 # This must be done before importing np
-threads = "24"
+threads = "16"
 os.environ["OPENBLAS_NUM_THREADS"] = threads
+os.environ["OMP_NUM_THREADS"] = threads
+os.environ["MKL_NUM_THREADS"] = threads
+os.environ["VECLIB_MAXIMUM_THREADS"] = threads
+os.environ["NUMEXPR_NUM_THREADS"] = threads
 
 from scipy.optimize import minimize, NonlinearConstraint
 import numpy as np

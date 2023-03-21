@@ -1,3 +1,14 @@
+
+import os
+# Set environment variables to limit multithreading
+# This must be done before importing np
+threads = "16"
+os.environ["OPENBLAS_NUM_THREADS"] = threads
+os.environ["OMP_NUM_THREADS"] = threads
+os.environ["MKL_NUM_THREADS"] = threads
+os.environ["VECLIB_MAXIMUM_THREADS"] = threads
+os.environ["NUMEXPR_NUM_THREADS"] = threads
+
 from scipy.optimize import minimize, NonlinearConstraint, Bounds
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +23,8 @@ import opt_constr # Jon's custom constrained optimization
 # start timer
 times = tic()
 
-x0 = x0_hyperboloid() # initial guess
+#x0 = x0_hyperboloid() # initial guess
+x0 = x0_cube() # initial guess
 
 # Run IP optimization
 print(f"Running Interior Point Optimization")
