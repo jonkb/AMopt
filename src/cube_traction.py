@@ -90,11 +90,21 @@ def verify_tractions(out, problem, state, extend=False):
         verbose=False,
     )
 
+    omega = problem.domain.regions['Omega']
+    displacement = problem.get_variables()['u'].get_state_in_region(omega)
+
+    max_u = np.max(displacement)
+
     # Calculate the von Mises stress
     von_mises_stress = get_von_mises_stress(stress.squeeze())
 
     # Find the maximum von Mises stress and its location
     max_stress = von_mises_stress.max()
+
+    # TODO: This is a terrible hack to make sure that to penalize separation
+    if max_u > settings.side_lengths[2]:
+        max_stress += settings.stress_limit*100
+
     with open(f'{tag}_max_stress.txt', 'w') as f:
         f.write(str(max_stress))
     max_stress_idx = nm.argmax(von_mises_stress)
