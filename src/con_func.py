@@ -30,7 +30,6 @@ def con_func(x):
 
     # Evaluate mesh in FEA
     results = run(["sfepy-run", "cube_traction.py", "-d", f"tag='{tag}'"], stdout=settings.terminal_output, stderr=settings.terminal_output)
-    # vprnt(results.stdout)
 
     # Pull max stress from max_stress.txt
     max_stress = np.loadtxt(f'{tag}_max_stress.txt', dtype=float)
@@ -40,3 +39,8 @@ def con_func(x):
     g0[0] = max_stress - stress_limit
 
     return g0
+    
+if __name__ == "__main__":
+    x0 = x0_cube() # initial guess
+    con_func(x0)
+    run(["sfepy-view", "x000000.vtk"]) # Visualize the results

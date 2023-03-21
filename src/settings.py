@@ -20,7 +20,8 @@ maxiter = 3
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-resolution = np.array((4, 4, 3))
+# resolution = np.array((4, 4, 3))
+resolution = np.array((4, 4, 4))
 # voxel dimensions
 voxel_dim = side_lengths / resolution
 # face_thickness (int): Thickness of the top and bottom faces to be added, in
@@ -32,3 +33,5 @@ face_thickness=1
 rho = .0014 #g/mm3
 stress_limit = 50.0 # MPa - The average compressive stress limit I could find was 40-60 MPa
 
+# Applied load
+applied_traction = 8.0 # MPa
