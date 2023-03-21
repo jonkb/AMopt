@@ -31,12 +31,12 @@ def ip_min(f, g, x0, bounds=None, maxit=8, xtol=1e-3, rho=0.25, mu0=1):
         # Solve subproblem
         f_hat = lambda x: f_hat_ip(f, g, x, mu)
         res = spo.minimize(f_hat, xi, bounds=bounds, tol=1e-2)
+        it += 1
         print(f"Iteration {it}: \n{res}")
         # Set up for next iteration
         dx = np.linalg.norm(xi - res.x)
         xi = res.x
         mu *= rho
-        it += 1
     print(f"Optimal point: {xi}")
     print(f"#it: {it}")
     return res
