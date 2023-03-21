@@ -87,6 +87,12 @@ def rho2isosurf(rho, rho_cutoff=0.5):
         the cube.
 
     Uses the marching cubes algorithm from Scikit-image.
+
+    NOTE / TODO: I thought of a way to make the top & bottom plates thinner.
+        Before running marching cubes and before augmenting the density matrix
+        with the 6 faces, we could resample the density function at a higher
+        resolution. Use some interpolation scheme.
+        Downside: increase marching cubes time.
     
     Parameters
     ----------

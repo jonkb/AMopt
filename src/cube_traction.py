@@ -59,8 +59,7 @@ zmax_eps = (-0.00000001 + settings.voxel_dim[2]/2 + settings.side_lengths[2]
 
 def linear_tension(ts, coor, mode=None, **kwargs):
     if mode == 'qp':
-        # Pressure: 0.25 MPa
-        val = nm.tile(0.25, (coor.shape[0], 1, 1))
+        val = nm.tile(settings.applied_traction, (coor.shape[0], 1, 1))
 
         return {'val' : val}
 
@@ -101,7 +100,7 @@ def verify_tractions(out, problem, state, extend=False):
     # Find the maximum von Mises stress and its location
     max_stress = von_mises_stress.max()
 
-    # TODO: This is a terrible hack to make sure that to penalize separation
+    # TODO: This is a terrible hack to penalize separation
     if max_u > settings.side_lengths[2]:
         max_stress += settings.stress_limit*100
 
