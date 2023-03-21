@@ -13,14 +13,14 @@ terminal_output = DEVNULL
 # TODO: Temporary folder path
 
 # Max iterations for optimization
-maxiter = 10
+maxiter = 3
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-resolution = np.array((3, 3, 3))
+resolution = np.array((4, 4, 3))
 # voxel dimensions
 voxel_dim = side_lengths / resolution
 # face_thickness (int): Thickness of the top and bottom faces to be added, in

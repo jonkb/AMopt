@@ -362,7 +362,7 @@ def x0_cube():
     """
     X, Y, Z = XYZ_grid()
     # https://mathworld.wolfram.com/One-SheetedHyperboloid.html
-    rho = np.ones_like(Z)
+    rho = np.ones_like(Z) * 0.5001
     return rho.flatten()
 
 if __name__ == "__main__":

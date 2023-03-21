@@ -26,7 +26,7 @@ def con_func(x):
     np.savetxt(f"{tag}.txt", x)
 
     # Create the mesh
-    x2mesh(x, tag, out_format="mesh")
+    x2mesh(x, tag, dim=settings.resolution, out_format="mesh")
 
     # Evaluate mesh in FEA
     results = run(["sfepy-run", "cube_traction.py", "-d", f"tag='{tag}'"], stdout=settings.terminal_output, stderr=settings.terminal_output)
@@ -34,6 +34,7 @@ def con_func(x):
 
     # Pull max stress from max_stress.txt
     max_stress = np.loadtxt(f'{tag}_max_stress.txt', dtype=float)
+    vprnt(f"Max stress: {max_stress}")
     
     g0 = np.zeros(1)
     g0[0] = max_stress - stress_limit

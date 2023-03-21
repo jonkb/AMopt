@@ -8,10 +8,11 @@ from subprocess import run, call
 from util import *
 
 # start timer
-times = tic() 
+times = tic()
 
 # Scipy.optimize.minimize settings
 x0 = x0_hyperboloid() # initial guess
+# x0 = x0_cube() # initial guess
 lb = -np.inf
 ub = 0.0 
 theConstraints = NonlinearConstraint(con_func, lb, ub)#, finite_diff_rel_step=[1e8])
@@ -24,11 +25,15 @@ def callback(xk, res):
     """
     optimality.append(res.optimality)
     print(f"optimality: {res.optimality}")
+
+# Run SciPy minimize
 res = minimize(obj_func, x0, constraints=theConstraints, method='trust-constr', 
     bounds=theBounds, tol=1e-5, options=theOptions, callback=callback)
 
+# Save the x vector to file (FOR DEBUGGING)
+np.savetxt(f"cube_optimized.txt", res.x)
 # Save optimized voxelization here
-x2mesh(res.x, "cube-optimized", out_format="vtk")
+x2mesh(res.x, "cube_optimized", dim=settings.resolution, out_format="vtk")
 
 # Print results
 print("\n\n--- RESULTS ---")
@@ -43,4 +48,4 @@ print("--- -- -- -- -- -- -- -- ---\n\n")
 
 
 # Visualize the optimized voxelization
-run(["sfepy-view", "cube-optimized.vtk"])
+run(["sfepy-view", "cube_optimized.vtk"])
