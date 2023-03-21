@@ -42,7 +42,7 @@ def x2mesh(x, tag, dim="cube", out_format="mesh"):
 
     # Unflatten x
     N = x.size
-    if dim == "cube":
+    if isinstance(dim, str) and dim == "cube":
         nx = np.cbrt(N)
         assert np.round(nx, 8) % 1 == 0, ("For dim='cube', the length of x must be a cubic"
             f" number. N = {N}")
