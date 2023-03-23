@@ -103,6 +103,8 @@ def verify_tractions(out, problem, state, extend=False):
     # TODO: This is a terrible hack to penalize separation
     if max_u > settings.side_lengths[2]:
         max_stress += settings.stress_limit*100
+    if np.isnan(max_u):
+        max_stress = settings.stress_limit*200
 
     with open(f'{tag}_max_stress.txt', 'w') as f:
         f.write(str(max_stress))
