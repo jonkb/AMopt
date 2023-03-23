@@ -9,7 +9,7 @@ os.environ["MKL_NUM_THREADS"] = threads
 os.environ["VECLIB_MAXIMUM_THREADS"] = threads
 os.environ["NUMEXPR_NUM_THREADS"] = threads
 
-from scipy.optimize import minimize, NonlinearConstraint
+from scipy.optimize import minimize, NonlinearConstraint, differential_evolution
 import numpy as np
 import matplotlib.pyplot as plt
 from obj_func import obj_func, f_calls
@@ -27,7 +27,7 @@ x0 = x0_hyperboloid() # initial guess
 lb = -np.inf
 ub = 0.0 
 theConstraints = NonlinearConstraint(con_func, lb, ub)#, finite_diff_rel_step=[1e8])
-theBounds = [(0, 1)]
+theBounds = [(0, 1)] * np.prod(settings.resolution)
 theOptions = {'maxiter':settings.maxiter}#, 'finite_diff_rel_step':[1e6]}
 optimality = []
 def callback(xk, res):
@@ -38,8 +38,11 @@ def callback(xk, res):
     print(f"optimality: {res.optimality}")
 
 # Run SciPy minimize
-res = minimize(obj_func, x0, constraints=theConstraints, method='trust-constr', 
-    bounds=theBounds, tol=1e-5, options=theOptions, callback=callback)
+#res = minimize(obj_func, x0, constraints=theConstraints, method='trust-constr', 
+#    bounds=theBounds, tol=1e-5, options=theOptions, callback=callback)
+# SciPy differential evolution
+res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
+    tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
 
 # Save the x vector to file (FOR DEBUGGING)
 np.savetxt(f"x_optimized.txt", res.x)
@@ -59,4 +62,4 @@ print("--- -- -- -- -- -- -- -- ---\n\n")
 
 
 # Visualize the optimized voxelization
-run(["sfepy-view", "x_optimized.vtk"])
+#run(["sfepy-view", "x_optimized.vtk"])
