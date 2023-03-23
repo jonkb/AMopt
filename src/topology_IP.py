@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from obj_func import obj_func, f_calls
 from con_func import con_func, g_calls
-from meshing import x2mesh, x0_cube, x0_hyperboloid
+from meshing import x2mesh, x0_cube, x0_hyperboloid, x0_rand
 from subprocess import run, call
 from util import *
 
@@ -24,7 +24,10 @@ import opt_constr # Jon's custom constrained optimization
 times = tic()
 
 #x0 = x0_hyperboloid() # initial guess
-x0 = x0_cube() # initial guess
+#x0 = x0_cube() # initial guess
+x0 = x0_rand()
+# NOTE: Nothing guarantees that x0 will be feasible, so IP is probably the 
+#   wrong method for this x0
 
 # Run IP optimization
 print(f"Running Interior Point Optimization")

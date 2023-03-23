@@ -367,8 +367,14 @@ def x0_cube():
     """ Generate an x-vector for a cube as an initial guess
     """
     X, Y, Z = XYZ_grid()
-    # https://mathworld.wolfram.com/One-SheetedHyperboloid.html
     rho = np.ones_like(Z) * 0.5001
+    return rho.flatten()
+
+def x0_rand():
+    """ Generate a random x-vector as an initial guess
+    """
+    #X, Y, Z = XYZ_grid()
+    rho = np.random.rand(*settings.resolution)
     return rho.flatten()
 
 if __name__ == "__main__":
