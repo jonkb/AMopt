@@ -1,5 +1,5 @@
-Merge "x000001.stl";
+Merge "x000009.stl";
 Surface Loop(1) = {1};
 Volume(1) = {1};
 Mesh 3;
-Save "x000001.msh";
+Save "x000009.msh";

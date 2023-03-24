@@ -1,14 +1,28 @@
 """ Settings.py
 This file is intended to be imported as a module by the other python files so
 they all have access to the same global settings.
+
+Should be imported before importing numpy
 """
-import numpy as np
 from subprocess import DEVNULL
 
 ## General settings
 # Whether to print to console when calling the util.vprnt function
 verbose = True
 terminal_output = DEVNULL
+
+## Limit multithreading (useful when running on a large, public computer)
+max_threads = "16"
+import os
+# Set environment variables to limit multithreading
+# This must be done before importing numpy
+threads = "16"
+os.environ["OPENBLAS_NUM_THREADS"] = threads
+os.environ["OMP_NUM_THREADS"] = threads
+os.environ["MKL_NUM_THREADS"] = threads
+os.environ["VECLIB_MAXIMUM_THREADS"] = threads
+os.environ["NUMEXPR_NUM_THREADS"] = threads
+
 
 # TODO: Temporary folder path
 
@@ -17,11 +31,13 @@ maxiter = 8
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation
+import numpy as np
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-# resolution = np.array((4, 4, 3))
-resolution = np.array((4, 4, 4))
+resolution = np.array((2, 2, 2))
+# Number of design variables
+nx = np.prod(resolution)
 # voxel dimensions
 voxel_dim = side_lengths / resolution
 # face_thickness (int): Thickness of the top and bottom faces to be added, in
