@@ -12,16 +12,15 @@ verbose = True
 terminal_output = DEVNULL
 
 ## Limit multithreading (useful when running on a large, public computer)
-max_threads = "16"
+max_threads = "24"
 import os
 # Set environment variables to limit multithreading
 # This must be done before importing numpy
-threads = "16"
-os.environ["OPENBLAS_NUM_THREADS"] = threads
-os.environ["OMP_NUM_THREADS"] = threads
-os.environ["MKL_NUM_THREADS"] = threads
-os.environ["VECLIB_MAXIMUM_THREADS"] = threads
-os.environ["NUMEXPR_NUM_THREADS"] = threads
+os.environ["OPENBLAS_NUM_THREADS"] = max_threads
+os.environ["OMP_NUM_THREADS"] = max_threads
+os.environ["MKL_NUM_THREADS"] = max_threads
+os.environ["VECLIB_MAXIMUM_THREADS"] = max_threads
+os.environ["NUMEXPR_NUM_THREADS"] = max_threads
 
 
 # TODO: Temporary folder path

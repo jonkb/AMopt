@@ -1,4 +1,4 @@
-import settings
+import settings # Be sure to import settings before importing numpy
 from obj_func import obj_func
 from con_func import con_func
 from meshing import x2mesh, x0_cube, x0_hyperboloid
@@ -33,7 +33,7 @@ def callback(xk, res):
 ## SciPy differential evolution
 # res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
 #     tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
-res = differential_evolution(obj_func, bounds=theBounds, popsize=20,
+res = differential_evolution(obj_func, bounds=theBounds, popsize=25,
     constraints=theConstraints, tol=5e-2, disp=settings.verbose, 
     maxiter=settings.maxiter, polish=True)
 
