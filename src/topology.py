@@ -41,8 +41,11 @@ def callback(xk, res):
 #res = minimize(obj_func, x0, constraints=theConstraints, method='trust-constr', 
 #    bounds=theBounds, tol=1e-5, options=theOptions, callback=callback)
 # SciPy differential evolution
-res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
-    tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
+#res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
+#    tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
+res = differential_evolution(obj_func, bounds=theBounds, popsize=20,
+    constraints=theConstraints, tol=5e-2, disp=settings.verbose, 
+    maxiter=settings.maxiter, polish=True)
 
 # Save the x vector to file (FOR DEBUGGING)
 np.savetxt(f"x_optimized.txt", res.x)

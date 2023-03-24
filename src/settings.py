@@ -13,7 +13,7 @@ terminal_output = DEVNULL
 # TODO: Temporary folder path
 
 # Max iterations for optimization
-maxiter = 4
+maxiter = 8
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation
