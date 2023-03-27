@@ -6,15 +6,23 @@ import numpy as np
 import time
 from scipy.optimize import differential_evolution
 import matplotlib.pyplot as plt
-
+import numpy as np
+import matplotlib.pyplot as plt
+from obj_func import obj_func
+from con_func import con_func
+from meshing import x2mesh, x0_cube, x0_hyperboloid
+from subprocess import run, call
+from util import *
 
 # Settings
 verbose = False
-plot = True
+plot = False
 tolerance = 1e-5
 starting_population = 1000
 function_span = (-10, 10)
-maxiter = 30
+maxiter = 10
+
+n_p = 200 # population size
 
 # Global Variables
 mutations = 0
@@ -26,19 +34,6 @@ def setup():
     f.truncate(0) # need '0' when using r+
     with open("Genetic Algorithm Log.txt", "a") as f:
             print("Genetic Algorithm Results", file=f)
-
-def vprnt(*args, log=False, verbose=verbose):
-    """ Thin wrapper around the standard print function
-    Only prints if verbose == True
-    """
-    if verbose:
-        print(*args)
-    if log:
-        return
-        #print to log file
-        with open("Genetic Algorithm Log.txt", "a") as f:
-            print(*args, file=f)
-
 
 # GA FUNCTIONS
 def generate_population(n_individuals, n_variables, span=(0, 1)):
@@ -179,11 +174,11 @@ def mutate(population, chance=0.2, k=None, percent=15):
             gene = np.random.randint(0, len(population[0]))
             a = np.random.randint(0, len(population))
             mutated_population[a, gene] = np.random.uniform(function_span[0], function_span[1], 1)
-            vprnt("Mutated gene", gene, "on individual", a, log=True)
+            vprnt("Mutated gene", gene, "on individual", a)
             global mutations
             mutations += 1
         else:
-            vprnt("No mutation", log=True)
+            vprnt("No mutation")
     return mutated_population
 
 def plot_population(population, fitness, title=""):
@@ -194,15 +189,7 @@ def plot_population(population, fitness, title=""):
         fitness (ndarray): ndarray of fitness for each individual.
         title (str, optional): Title of the plot. Defaults to "".
     """
-    plt.figure(figsize=(8, 8))
-    plt.title(title)
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.xlim(function_span[0], function_span[1])
-    plt.ylim(function_span[0], function_span[1])
-    plt.scatter(population[:,0], population[:,1], c=fitness, cmap='viridis')
-    plt.colorbar()
-    plt.show()
+    pass
 
 # Fitness Function
 def eggshell_fitness_function(x):
@@ -213,23 +200,26 @@ def eggshell_fitness_function(x):
     return fitness
 
 # hw5 main
-def hw5():
-    setup()
-    population = generate_population(starting_population, 2, span=function_span)
+def hw5_2():
+    # Set up the population
+    nv = settings.resolution[0]*settings.resolution[1]*settings.resolution[2]
+    population  =   generate_population(n_p, nv, span=(-10,10))
+    fitness = np.zeros(n_p)
     i = 0
-    while(i < maxiter):
-        vprnt("\nGeneration", i, log=True)
-        vprnt("Population size:", len(population), log=True)
-        vprnt("Population:", population, log=False)
 
-        # Evaluate fitness
-        fitness     =    eggshell_fitness_function(population)
-        vprnt("Fitness:", fitness)
+    while(i < maxiter):
+        vprnt("\nGeneration", i)
+        vprnt("Population size:", len(population))
+        vprnt("Population:", population)
+
+        # Set up the fitness function
+        for i in range(len(population)):
+            fitness[i] = obj_func(population[i])
 
         # Selection
-        # population  =    sort_and_select(population, fitness) # Elitism
+        population  =    sort_and_select(population, fitness) # Elitism
         # population  =    random_selection(population) # Random
-        population  =    roulette_selection(population, fitness) # Roulette
+        # population  =    roulette_selection(population, fitness) # Roulette
 
         # Crossover
         population  =    mate(population) # next generation
@@ -238,28 +228,42 @@ def hw5():
         population  =    mutate(population)
 
         i+=1 # increment generation
+    
 
-        # plot ever 10 generations
-        if plot and i % 10 == 0:
-            plot_population(population, fitness, i)
+    
 
+    # Save the x vector to file (FOR DEBUGGING)
+    np.savetxt(f"cube_optimized.txt", population)
 
-    # print results
-    vprnt("\nTotal Generations:", i, verbose=True, log=True)
-    vprnt("Starting Population Size:", starting_population, verbose=True, log=True)
-    vprnt("Final Population Size:", len(population), verbose=True, log=True)
-    vprnt("Final Population:", population, log=True)
-    vprnt("Final Fitness:", eggshell_fitness_function(population), log=True)
-    vprnt("Minimum:", min(eggshell_fitness_function(population)), log=True, verbose=True)
-    vprnt("x*:", population[0], verbose=True, log=True)
-    vprnt("Mutations:", mutations, verbose=True, log=True)
+    # Save optimized voxelization here
+    # x2mesh(res.x, "cube_optimized", dim=settings.resolution, out_format="vtk")
+
+    # Print results
+    print("\n\n--- RESULTS ---")
+    from obj_func import f_calls
+    from con_func import g_calls
+    print(f"Number of function calls: {f_calls}")
+    print(f"Number of constraint calls: {g_calls}")
+    print("\nTotal Generations:", i)
+    print("Starting Population Size:", starting_population)
+    print("Final Population Size:", len(population))
+    print("Final Population:", population)
+    print("Minimum:", min(fitness))
+    print("x*:", population[0])
+    print("Mutations:", mutations)
+    print("--- -- -- -- -- -- -- -- ---\n\n")
+
+    x2mesh(population[0], "cube_optimized", dim=settings.resolution, out_format="vtk")
+
+    # Visualize the optimized voxelization
+    run(["sfepy-view", "cube_optimized.vtk"])
 
 
 
 if __name__ == "__main__":
-    start_time = time.time()
-    hw5()
-    print("Time:", round(time.time() - start_time), "seconds")
+    times = tic()
+    hw5_2()
+    toc(times, msg=f"\n\nTotal optimization time for {maxiter} Iterations:", total=True)
 
     if plot:
         # graph eggshell function on 3d plot
@@ -271,49 +275,3 @@ if __name__ == "__main__":
         Z = 0.1*X**2 + 0.1*Y**2 - np.cos(3*X) - np.cos(3*Y)
         ax.plot_surface(X, Y, Z, linewidth=1, antialiased=False)
         plt.show()
-
-
-
-
-
-'''
-def crossover(population, chance=0.2, k=2):
-    """Crossover two individuals.
-
-    Args:
-        population (ndarray): ndarray of individuals to crossover.
-        chance (float, optional): Chance of crossover. Defaults to 0.2.
-        k (int, optional): Number of possible crossovers. Defaults to 2.
-
-    Returns:
-        ndarray: ndarray of the two individuals after crossover.
-    """
-    crossed_population = population.copy()
-    for i in range(k):
-        if np.random.rand() < chance:
-            gene = np.random.randint(0, len(population[0]))
-            a = np.random.randint(0, len(population))
-            b = np.random.randint(0, len(population))
-            crossed_population[a, gene] = population[b, gene]
-            crossed_population[b, gene] = population[a, gene]
-            vprnt("Crossover gene", gene, "with individuals", a, "&", b, log=True)
-        else:
-            vprnt("No crossover", log=True)
-    return crossed_population
-
-    
-
-    #     #calculate change in fitness
-    #     new_min = min(fitness)
-    #     change = abs(new_min - last_min)
-    #     if change < tolerance:
-    #         msg = "Success - Change in fitness is less than tolerance"
-    #         break
-    #     else:
-    #         old_min = new_min
-
-    # if i == maxiter:
-    #     msg = "Failed - Maximum iterations reached"
-
-    # vprnt(msg, log=True, verbose=True)
-'''
