@@ -7,7 +7,7 @@ from subprocess import DEVNULL
 
 ## General settings
 # Whether to print to console when calling the util.vprnt function
-verbose = True
+verbose = False
 terminal_output = DEVNULL
 
 # TODO: Temporary folder path
@@ -20,7 +20,7 @@ maxiter = 3
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-resolution = np.array((4, 4, 3))
+resolution = np.array((3, 3, 3))
 # voxel dimensions
 voxel_dim = side_lengths / resolution
 # face_thickness (int): Thickness of the top and bottom faces to be added, in
