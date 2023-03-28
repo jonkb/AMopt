@@ -33,7 +33,7 @@ def callback(xk, res):
 ## SciPy differential evolution
 # res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
 #     tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
-res = differential_evolution(obj_func, bounds=theBounds, popsize=25,
+res = differential_evolution(obj_func, bounds=theBounds, popsize=50,
     constraints=theConstraints, tol=5e-2, disp=settings.verbose, 
     maxiter=settings.maxiter, polish=True)
 
@@ -64,5 +64,5 @@ toc(times, msg=f"\n\nTotal optimization time for {settings.maxiter} Iterations:"
 print("--- -- -- -- -- -- -- -- ---\n\n")
 
 # Visualize the optimized voxelization
-run(["sfepy-view", "x_optimized.vtk"], 
-    stdout=settings.terminal_output, stderr=settings.terminal_output)
+#run(["sfepy-view", "x_optimized.vtk"], 
+#    stdout=settings.terminal_output, stderr=settings.terminal_output)
