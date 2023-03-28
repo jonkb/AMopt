@@ -26,7 +26,7 @@ os.environ["NUMEXPR_NUM_THREADS"] = max_threads
 # TODO: Temporary folder path
 
 # Max iterations for optimization
-maxiter = 8
+maxiter = 12
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation

@@ -33,9 +33,20 @@ def callback(xk, res):
 ## SciPy differential evolution
 # res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
 #     tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
-res = differential_evolution(obj_func, bounds=theBounds, popsize=50,
-    constraints=theConstraints, tol=5e-2, disp=settings.verbose, 
-    maxiter=settings.maxiter, polish=True)
+#res = differential_evolution(obj_func, bounds=theBounds, popsize=50,
+#    constraints=theConstraints, tol=5e-2, disp=settings.verbose, 
+#    maxiter=settings.maxiter, polish=True)
+
+## Jon's GA
+from opt_GF import GA
+print("Running GA")
+constraints = (con_func,)
+res = GA(obj_func, theBounds, constraints=constraints, it_max=settings.maxiter,
+    pop_size=15, xtol=1e-6, mutation1=0.075, mutation2=0.400, 
+    verbose=settings.verbose)
+res.printall()
+# Tacky fix for compatability
+res.x = res.x_star
 
 ## Jon's IP constrained optimization
 # import opt_constr
