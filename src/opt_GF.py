@@ -180,6 +180,27 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
         ngev += N_pop * N_g
     else:
         popg = None # Initialize to not break things later
+    
+    # Print status after initial sample (Iteration 0)
+    if (callback is not None) or verbose:
+        xbest, fbest, gbest, isfeasible = find_best(population, popf, popg)
+        if verbose:
+            print(f"Iteration {it} (initial sample) complete."
+                f"\n\tBest x: {xbest}"
+                f"\n\tBest f: {fbest}"
+                f"\n\tBest g: {gbest}"
+                f" {'(feasible)' if isfeasible else '(not feasible)'}"
+                f"\n\tMax x-variance: {maxvar}")
+        if (callback is not None):
+            # Pack the data relevant to the current state of the GA
+            #   into this optsol object
+            data = optsol(xbest, fbest, gbest, it=it)
+            data.maxvar = maxvar
+            data.isfeasible = isfeasible
+            data.population = population
+            data.popf = popf
+            data.popg = popg
+            callback(data)
 
     while (it < it_max) and (maxvar > xtol):
         ## Tournament selection

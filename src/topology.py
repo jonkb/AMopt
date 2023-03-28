@@ -43,9 +43,12 @@ from opt_GF import GA
 def GAcb(data):
     # Delete unneeded temporary files after every iteration
     file_cleanup(["stl", "msh", "mesh"])
+    # Print the time for this iteration
+    toc(times, f"Iteration {data.it}")
 
 print("Running GA")
 constraints = (con_func,)
+toc(times) # Start timing GA
 res = GA(obj_func, theBounds, constraints=constraints, it_max=settings.maxiter,
     pop_size=15, xtol=1e-6, mutation1=0.075, mutation2=0.400, 
     verbose=settings.verbose, callback=GAcb)
