@@ -39,11 +39,16 @@ def callback(xk, res):
 
 ## Jon's GA
 from opt_GF import GA
+
+def GAcb(data):
+    # Delete unneeded temporary files after every iteration
+    file_cleanup(["stl", "msh", "mesh"])
+
 print("Running GA")
 constraints = (con_func,)
 res = GA(obj_func, theBounds, constraints=constraints, it_max=settings.maxiter,
     pop_size=15, xtol=1e-6, mutation1=0.075, mutation2=0.400, 
-    verbose=settings.verbose)
+    verbose=settings.verbose, callback=GAcb)
 res.printall()
 # Tacky fix for compatability
 res.x = res.x_star

@@ -45,6 +45,7 @@ def con_func(x):
     return g0
     
 if __name__ == "__main__":
-    x0 = x0_cube() # initial guess
-    con_func(x0)
+    x0 = x0_cube()
+    g = con_func(x0)
+    print(f"g = {g}")
     run(["sfepy-view", "x000000.vtk"]) # Visualize the results

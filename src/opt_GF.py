@@ -112,7 +112,8 @@ def find_best(population, popf, popg=None):
         return x_star, f_star, None, None
 
 def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8, 
-    figax=None, mutation1=0.05, mutation2=0.40, elitist=True, verbose=False):
+    mutation1=0.05, mutation2=0.40, elitist=True, figax=None, verbose=False,
+    callback=None):
     """ Genetic Algorithm Optimization
 
     Sampling: LHS
@@ -140,7 +141,8 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
         figas[1] = pyplot axis on that figure. The population will be displayed 
         on that figure using scatter.
     elitist (bool): Whether to forcibly keep the best point.
-    verbose (bool): Whether to print every iteration
+    verbose (bool): Whether to print a message every iteration.
+    callback (function): A function to be called after every iteration.
     """
 
     ## Generate initial population (LHS)
@@ -259,14 +261,25 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
         maxvar = np.max(np.var(population, axis=0))
 
         it += 1
-        if verbose:
+        if (callback is not None) or verbose:
             xbest, fbest, gbest, isfeasible = find_best(population, popf, popg)
-            print(f"Iteration {it} complete."
-                f"\n\tBest x: {xbest}"
-                f"\n\tBest f: {fbest}"
-                f"\n\tBest g: {gbest}"
-                f" {'(feasible)' if isfeasible else '(not feasible)'}"
-                f"\n\tMax x-variance: {maxvar}")
+            if verbose:
+                print(f"Iteration {it} complete."
+                    f"\n\tBest x: {xbest}"
+                    f"\n\tBest f: {fbest}"
+                    f"\n\tBest g: {gbest}"
+                    f" {'(feasible)' if isfeasible else '(not feasible)'}"
+                    f"\n\tMax x-variance: {maxvar}")
+            if (callback is not None):
+                # Pack the data relevant to the current state of the GA
+                #   into this optsol object
+                data = optsol(xbest, fbest, gbest, it=it)
+                data.maxvar = maxvar
+                data.isfeasible = isfeasible
+                data.population = population
+                data.popf = popf
+                data.popg = popg
+                callback(data)
     
     if it == it_max:
         msg = "Max iterations reached. "
