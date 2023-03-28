@@ -8,7 +8,8 @@ Jon Black
 """
 
 import numpy as np
-from scipy.stats import qmc
+#from scipy.stats import qmc # Not compatible with Python 3.6
+from pyDOE import lhs
 from optsol import optsol
 
 # Initialize random number generator
@@ -148,9 +149,11 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
     ubounds = bounds[:,1]
     N_x = bounds.shape[0]
     N_pop = pop_size * N_x
-    sampler = qmc.LatinHypercube(d=N_x)
-    sample = sampler.random(n=N_pop)
-    population = qmc.scale(sample, lbounds, ubounds)
+    #sampler = qmc.LatinHypercube(d=N_x)
+    #sample = sampler.random(n=N_pop)
+    #population = qmc.scale(sample, lbounds, ubounds)
+    sample = lhs(N_x, N_pop) # Uniform btw 0 and 1
+    population = sample * (ubounds-lbounds) + lbounds
     # Other setup
     N_g = len(constraints)
     N_pairs_tourn = int(np.ceil(N_pop/2))

@@ -34,7 +34,7 @@ import numpy as np
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-resolution = np.array((2, 2, 2))
+resolution = np.array((4, 4, 4))
 # Number of design variables
 nx = np.prod(resolution)
 # voxel dimensions
