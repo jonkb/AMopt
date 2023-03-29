@@ -17,10 +17,9 @@ from random import shuffle
 import time
 
 # Settings
-verbose = True
 plot = False
 tolerance = 1e-3
-starting_population = 1000
+starting_population = 100
 function_span = (0, 1)
 
 # Global Variables
@@ -261,6 +260,7 @@ def mutate(population, chance=0.2, k=None, percent=15):
 
 # hw5 main
 def hw5_2():
+    start_time = time.time()
     # Set up the population
     nv = settings.resolution[0]*settings.resolution[1]*settings.resolution[2]
     population  =   generate_population(starting_population, nv, span=function_span)
@@ -286,6 +286,8 @@ def hw5_2():
 
         i+=1 # increment generation
 
+    end_time = time.time()
+
     # Save the x vector to file (FOR DEBUGGING)
     np.savetxt(f"cube_optimized.txt", population)
 
@@ -302,7 +304,23 @@ def hw5_2():
     print("Minimum:", min(fitness))
     print("x*:", population[0])
     print("Mutations:", mutations)
+    print(f"Total time: {end_time - start_time} seconds")
     print("--- -- -- -- -- -- -- -- ---\n\n")
+
+    # Save results to file
+    with open("results.txt", "a") as f:
+        f.write(f"\n\n--- RESULTS ---")
+        f.write(f"Cube Dimension: {settings.resolution}\n")
+        f.write(f"Number of function calls: {f_calls}\n")
+        f.write(f"Number of constraint calls: {g_calls}\n")
+        f.write(f"Total Generations: {i}\n")
+        f.write(f"Starting Population Size: {starting_population}\n")
+        f.write(f"Final Population Size: {len(population)}\n")
+        f.write(f"Final Population: {population}\n")
+        f.write(f"Minimum: {min(fitness)}\n")
+        f.write(f"x*: {population[0]}\n")
+        f.write(f"Mutations: {mutations}\n")
+        f.write(f"Total time: {end_time - start_time} seconds\n")
 
     x2mesh(population[0], "cube_optimized", dim=settings.resolution, out_format="vtk")
 
@@ -312,7 +330,4 @@ def hw5_2():
 
 
 if __name__ == "__main__":
-    start_time = time.time()
     hw5_2()
-    end_time = time.time()
-    print(f"Total time: {end_time - start_time} seconds")
