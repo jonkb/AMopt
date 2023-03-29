@@ -45,6 +45,8 @@ def GAcb(data):
     file_cleanup(["stl", "msh", "mesh"])
     # Print the time for this iteration
     toc(times, f"Iteration {data.it}")
+    # Save the population to file
+    np.savetxt(f"population_it{data.it}.txt", data.population)
 
 print("Running GA")
 constraints = (con_func,)
