@@ -20,7 +20,7 @@ import time
 verbose = True
 plot = False
 tolerance = 1e-3
-starting_population = 6
+starting_population = 1000
 function_span = (0, 1)
 
 # Global Variables
