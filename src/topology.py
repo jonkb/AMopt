@@ -1,4 +1,4 @@
-import settings
+import settings # Be sure to import settings before importing numpy
 from obj_func import obj_func
 from con_func import con_func
 from meshing import x2mesh, x0_cube, x0_hyperboloid
@@ -12,7 +12,7 @@ import numpy as np
 times = tic()
 
 ## Initial guess
-x0 = x0_hyperboloid()
+# x0 = x0_hyperboloid()
 # x0 = x0_cube()
 
 ## SciPy minimize
@@ -33,12 +33,31 @@ def callback(xk, res):
 ## SciPy differential evolution
 # res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
 #     tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
+#res = differential_evolution(obj_func, bounds=theBounds, popsize=50,
+#    constraints=theConstraints, tol=5e-2, disp=settings.verbose, 
+#    maxiter=settings.maxiter, polish=True)
+
+## Jon's GA
+from opt_GF import GA
+
+def GAcb(data):
+    # Delete unneeded temporary files after every iteration
+    file_cleanup(["stl", "msh", "mesh"])
+
+print("Running GA")
+constraints = (con_func,)
+res = GA(obj_func, theBounds, constraints=constraints, it_max=settings.maxiter,
+    pop_size=15, xtol=1e-6, mutation1=0.075, mutation2=0.400, 
+    verbose=settings.verbose, callback=GAcb)
+res.printall()
+# Tacky fix for compatability
+res.x = res.x_star
 
 ## Jon's IP constrained optimization
-import opt_constr
-print(f"Running Interior Point Optimization")
-res = opt_constr.ip_min(obj_func, con_func, x0, maxit=settings.maxiter,
-    bounds=Bounds(0,1))
+# import opt_constr
+# print(f"Running Interior Point Optimization")
+# res = opt_constr.ip_min(obj_func, con_func, x0, maxit=settings.maxiter,
+#     bounds=Bounds(0,1))
 
 ## Inspect results
 # Save the x vector to file
@@ -61,5 +80,5 @@ toc(times, msg=f"\n\nTotal optimization time for {settings.maxiter} Iterations:"
 print("--- -- -- -- -- -- -- -- ---\n\n")
 
 # Visualize the optimized voxelization
-run(["sfepy-view", "x_optimized.vtk"], 
-    stdout=settings.terminal_output, stderr=settings.terminal_output)
+#run(["sfepy-view", "x_optimized.vtk"], 
+#    stdout=settings.terminal_output, stderr=settings.terminal_output)

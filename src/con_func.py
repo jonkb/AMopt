@@ -32,8 +32,12 @@ def con_func(x):
     results = run(["sfepy-run", "cube_traction.py", "-d", f"tag='{tag}'"], stdout=settings.terminal_output, stderr=settings.terminal_output)
 
     # Pull max stress from max_stress.txt
-    max_stress = np.loadtxt(f'{tag}_max_stress.txt', dtype=float)
-    vprnt(f"Max stress: {max_stress}")
+    try:
+        max_stress = np.loadtxt(f'{tag}_max_stress.txt', dtype=float)
+        vprnt(f"Max stress: {max_stress}")
+    except:
+        max_stress = settings.stress_limit*300
+        vprnt(f"Error: unable to load max stress")
     
     g0 = np.zeros(1)
     g0[0] = max_stress - stress_limit
@@ -41,6 +45,7 @@ def con_func(x):
     return g0
     
 if __name__ == "__main__":
-    x0 = x0_cube() # initial guess
-    con_func(x0)
+    x0 = x0_cube()
+    g = con_func(x0)
+    print(f"g = {g}")
     run(["sfepy-view", "x000000.vtk"]) # Visualize the results
