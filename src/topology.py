@@ -1,22 +1,24 @@
-from scipy.optimize import minimize, NonlinearConstraint
-import numpy as np
-import matplotlib.pyplot as plt
-from obj_func import obj_func, f_calls
-from con_func import con_func, g_calls
+import settings
+from obj_func import obj_func
+from con_func import con_func
 from meshing import x2mesh, x0_cube, x0_hyperboloid
-from subprocess import run, call
 from util import *
+from subprocess import run
+from scipy.optimize import (NonlinearConstraint, Bounds, minimize, 
+    differential_evolution)
+import numpy as np
 
 # start timer
 times = tic()
 
+## Initial guess
+x0 = x0_hyperboloid()
+# x0 = x0_cube()
+
+## SciPy minimize
 # Scipy.optimize.minimize settings
-x0 = x0_hyperboloid() # initial guess
-# x0 = x0_cube() # initial guess
-lb = -np.inf
-ub = 0.0 
-theConstraints = NonlinearConstraint(con_func, lb, ub)#, finite_diff_rel_step=[1e8])
-theBounds = [(0, 1)]
+theConstraints = NonlinearConstraint(con_func, -np.inf, 0.0)#, finite_diff_rel_step=[1e8])
+theBounds = [(0, 1)] * settings.nx
 theOptions = {'maxiter':settings.maxiter}#, 'finite_diff_rel_step':[1e6]}
 optimality = []
 def callback(xk, res):
@@ -25,20 +27,32 @@ def callback(xk, res):
     """
     optimality.append(res.optimality)
     print(f"optimality: {res.optimality}")
+#res = minimize(obj_func, x0, constraints=theConstraints, method='trust-constr', 
+#    bounds=theBounds, tol=1e-5, options=theOptions, callback=callback)
 
-# Run SciPy minimize
-res = minimize(obj_func, x0, constraints=theConstraints, method='trust-constr', 
-    bounds=theBounds, tol=1e-5, options=theOptions, callback=callback)
+# SciPy differential evolution
+res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
+    tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
 
-# Save the x vector to file (FOR DEBUGGING)
-np.savetxt(f"cube_optimized.txt", res.x)
+# ## Jon's IP constrained optimization
+# import opt_constr
+# print(f"Running Interior Point Optimization")
+# res = opt_constr.ip_min(obj_func, con_func, x0, maxit=settings.maxiter,
+#     bounds=Bounds(0,1))
+
+## Inspect results
+# Save the x vector to file
+np.savetxt(f"x_optimized.txt", res.x)
 # Save optimized voxelization here
-x2mesh(res.x, "cube_optimized", dim=settings.resolution, out_format="vtk")
+x2mesh(res.x, "x_optimized", dim=settings.resolution, out_format="mesh")
+# Calculate stress in x_optimized
+run(["sfepy-run", "cube_traction.py", "-d", f"tag='x_optimized'"], 
+    stdout=settings.terminal_output, stderr=settings.terminal_output)
 
 # Print results
 print("\n\n--- RESULTS ---")
 print(res)
-from obj_func import f_calls
+from obj_func import f_calls # NOTE: Must be imported at this time to work
 from con_func import g_calls
 print(f"Number of function calls: {f_calls}")
 print(f"Number of constraint calls: {g_calls}")
@@ -46,6 +60,6 @@ print(f"Optimality: {optimality}")
 toc(times, msg=f"\n\nTotal optimization time for {settings.maxiter} Iterations:", total=True)
 print("--- -- -- -- -- -- -- -- ---\n\n")
 
-
 # Visualize the optimized voxelization
-run(["sfepy-view", "cube_optimized.vtk"])
+run(["sfepy-view", "x_optimized.vtk"], 
+    stdout=settings.terminal_output, stderr=settings.terminal_output)
