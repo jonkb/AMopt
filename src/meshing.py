@@ -3,7 +3,7 @@ import numpy as np
 import sfepy.mesh.mesh_generators as femg # Used for creating voxel mesh
 from skimage import measure as skim
 from stl.mesh import Mesh as npstlMesh
-import gmsh # Used in stl2msh_py
+#import gmsh # Used in stl2msh_py
 import settings
 from util import vprnt, tic, toc
 
@@ -42,7 +42,7 @@ def x2mesh(x, tag, dim="cube", out_format="mesh"):
 
     # Unflatten x
     N = x.size
-    if type(dim) == str and dim == "cube":
+    if isinstance(dim, str) and dim == "cube":
         nx = np.cbrt(N)
         assert np.round(nx, 8) % 1 == 0, ("For dim='cube', the length of x must be a cubic"
             f" number. N = {N}")
@@ -87,6 +87,12 @@ def rho2isosurf(rho, rho_cutoff=0.5):
         the cube.
 
     Uses the marching cubes algorithm from Scikit-image.
+
+    NOTE / TODO: I thought of a way to make the top & bottom plates thinner.
+        Before running marching cubes and before augmenting the density matrix
+        with the 6 faces, we could resample the density function at a higher
+        resolution. Use some interpolation scheme.
+        Downside: increase marching cubes time.
     
     Parameters
     ----------
@@ -361,8 +367,14 @@ def x0_cube():
     """ Generate an x-vector for a cube as an initial guess
     """
     X, Y, Z = XYZ_grid()
-    # https://mathworld.wolfram.com/One-SheetedHyperboloid.html
     rho = np.ones_like(Z) * 0.5001
+    return rho.flatten()
+
+def x0_rand():
+    """ Generate a random x-vector as an initial guess
+    """
+    #X, Y, Z = XYZ_grid()
+    rho = np.random.rand(*settings.resolution)
     return rho.flatten()
 
 if __name__ == "__main__":

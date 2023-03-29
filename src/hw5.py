@@ -14,12 +14,13 @@ from meshing import x2mesh, x0_cube, x0_hyperboloid
 from subprocess import run, call
 from util import *
 from random import shuffle
+import time
 
 # Settings
 verbose = True
 plot = False
 tolerance = 1e-3
-starting_population = 5
+starting_population = 6
 function_span = (0, 1)
 
 # Global Variables
@@ -100,6 +101,8 @@ def tournament(population, fitness, con_func=None, mate="random"):
     Returns:
         ndarray: ndarray of the top k individuals for the next generation
     """
+    if len(population) % 2 != 0:
+        raise ValueError("Population size must be even.")
     next_gen_parents = np.zeros(population.shape)
     next_generation = np.zeros(population.shape)
     remaining = np.copy(population)
@@ -126,6 +129,8 @@ def tournament(population, fitness, con_func=None, mate="random"):
                     fitness_b = fitness_b[0]
 
                 # check constraints
+                a_con = False
+                b_con = False
                 if con_func(a) < 0: a_con = True
                 if con_func(b) < 0: b_con = True
 
@@ -264,14 +269,14 @@ def hw5_2():
 
     while(i < settings.maxiter):
         vprnt("\nGeneration", i)
-        print("Generation", i)
+        print("Generation", i+1, "of", settings.maxiter)
         vprnt("Population size:", len(population))
         vprnt("Population:", population)
-        print("Population", population)
 
         # Set up the fitness function
-        for i in range(len(population)):
-            fitness[i] = obj_func(population[i])
+        for k in range(len(population)):
+            fitness[k] = obj_func(population[k])
+        vprnt("Fitness:", fitness)
 
         # Selection & crossover
         population  =   tournament(population, fitness, con_func=con_func)
@@ -302,11 +307,12 @@ def hw5_2():
     x2mesh(population[0], "cube_optimized", dim=settings.resolution, out_format="vtk")
 
     # Visualize the optimized voxelization
-    run(["sfepy-view", "cube_optimized.vtk"])
+    # run(["sfepy-view", "cube_optimized.vtk"])
 
 
 
 if __name__ == "__main__":
-    times = tic()
+    start_time = time.time()
     hw5_2()
-    toc(times, msg=f"\n\nTotal optimization time for {settings.maxiter} Iterations:", total=True)
+    end_time = time.time()
+    print(f"Total time: {end_time - start_time} seconds")
