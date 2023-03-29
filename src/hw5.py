@@ -19,7 +19,7 @@ import time
 # Settings
 plot = False
 tolerance = 1e-3
-starting_population = 100
+starting_population = 15*settings.nx+1
 function_span = (0, 1)
 
 # Global Variables
@@ -215,14 +215,31 @@ def tournament(population, fitness, con_func=None, mate="random"):
     # Mate individuals
     if mate == "random":
         for i in range(len(population) - 1):
-            # Mate strongest individuals
+            # Mate random individuals
             a = next_gen_parents[i]
             b = next_gen_parents[i+1]
+            fitness_a = fitness[np.where((next_gen_parents == a).all(axis=1))[0]]
+            fitness_b = fitness[np.where((next_gen_parents == b).all(axis=1))[0]]
 
             # create children
             for j in range(len(population[0])):
-                next_generation[i, j] = (a[j] + b[j])/2
-                next_generation[i+1, j] = (a[j] + b[j])/2
+                next_generation[i, j] = (a[j] + b[j])/2 # one is an average
+                if fitness_a < fitness_b:
+                    next_generation[i+1, j] = 2*a[j] - b[j]
+                    #check to see if all points are in bounds
+                    for k in range(len(next_generation[i+1])):
+                        if next_generation[i+1][k] > function_span[k][1]:
+                            next_generation[i+1][k] = function_span[k][1]
+                        elif next_generation[i+1][k] < function_span[k][0]:
+                            next_generation[i+1][k] = function_span[k][0]
+                else:
+                    next_generation[i+1, j] = 2*b[j] - a[j]
+                    #check to see if all points are in bounds
+                    for k in range(len(next_generation[i+1])):
+                        if next_generation[i+1][k] > function_span[k][1]:
+                            next_generation[i+1][k] = function_span[k][1]
+                        elif next_generation[i+1][k] < function_span[k][0]:
+                            next_generation[i+1][k] = function_span[k][0]
             i += 2
         
     return next_generation
@@ -321,6 +338,9 @@ def hw5_2():
         f.write(f"x*: {population[0]}\n")
         f.write(f"Mutations: {mutations}\n")
         f.write(f"Total time: {end_time - start_time} seconds\n")
+
+    # write final population to file
+    np.savetxt(f"Optimized_Population.txt", population)
 
     x2mesh(population[0], "cube_optimized", dim=settings.resolution, out_format="vtk")
 

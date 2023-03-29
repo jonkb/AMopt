@@ -28,7 +28,7 @@ legacy = False
 # TODO: Temporary folder path
 
 # Max iterations for optimization
-maxiter = 12
+maxiter = 10
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation
@@ -36,7 +36,7 @@ import numpy as np
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-resolution = np.array((10, 10, 10))
+resolution = np.array((5, 5, 5))
 # Number of design variables
 nx = np.prod(resolution)
 # voxel dimensions
