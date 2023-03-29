@@ -253,6 +253,10 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
             # If elitist, leave the last entry in new_pop for the best from the 
             #   previous generation.
             couple = parents[int(np.floor(i_np/4))]
+            # NOTE: I pull 4 children from np/4 couples. 
+            #   The book makes np/2 pairs by doing two tournaments. I like that
+            #   this method ensures a point is never matched w/ itself,
+            #   but it may result in less diversity.
             p0 = population[couple[0]]
             p1 = population[couple[1]]
             f0 = popf[couple[0]]

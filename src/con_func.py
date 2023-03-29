@@ -14,7 +14,6 @@ def con_func(x):
     """
     Constraint function
     """
-    stress_limit = settings.stress_limit
 
     # Count call numbers to make unique filenames
     global g_calls
@@ -40,7 +39,7 @@ def con_func(x):
         vprnt(f"Error: unable to load max stress")
     
     g0 = np.zeros(1)
-    g0[0] = max_stress - stress_limit
+    g0[0] = max_stress - settings.stress_limit
 
     return g0
     
