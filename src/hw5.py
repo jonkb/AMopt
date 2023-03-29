@@ -3,7 +3,7 @@
 # Version 1.0
 
 import numpy as np
-import time
+import settings
 from scipy.optimize import differential_evolution
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,6 +13,7 @@ from con_func import con_func
 from meshing import x2mesh, x0_cube, x0_hyperboloid
 from subprocess import run, call
 from util import *
+from random import shuffle
 
 # Settings
 verbose = True
@@ -21,10 +22,8 @@ tolerance = 1e-3
 starting_population = 5
 function_span = (0, 1)
 
-
 # Global Variables
 mutations = 0
-
 
 # GA FUNCTIONS
 def generate_population(n_individuals, n_variables, span=(0, 1)):
@@ -164,7 +163,7 @@ def tournament(population, fitness, con_func=None, mate="random"):
                     index_b = index_b[0]
                 remaining = np.delete(remaining, index_b, axis=0)
                 h += 1
-                if remaining == []:
+                if remaining.size == 0:
                     break
     
     else: # no constraints
@@ -265,8 +264,10 @@ def hw5_2():
 
     while(i < settings.maxiter):
         vprnt("\nGeneration", i)
+        print("Generation", i)
         vprnt("Population size:", len(population))
         vprnt("Population:", population)
+        print("Population", population)
 
         # Set up the fitness function
         for i in range(len(population)):
@@ -282,9 +283,6 @@ def hw5_2():
 
     # Save the x vector to file (FOR DEBUGGING)
     np.savetxt(f"cube_optimized.txt", population)
-
-    # Save optimized voxelization here
-    # x2mesh(res.x, "cube_optimized", dim=settings.resolution, out_format="vtk")
 
     # Print results
     print("\n\n--- RESULTS ---")
@@ -311,4 +309,4 @@ def hw5_2():
 if __name__ == "__main__":
     times = tic()
     hw5_2()
-    toc(times, msg=f"\n\nTotal optimization time for {maxiter} Iterations:", total=True)
+    toc(times, msg=f"\n\nTotal optimization time for {settings.maxiter} Iterations:", total=True)
