@@ -12,22 +12,23 @@ verbose = False
 terminal_output = DEVNULL
 
 ## Limit multithreading (useful when running on a large, public computer)
-max_threads = "16"
+max_threads = "24"
 import os
 # Set environment variables to limit multithreading
 # This must be done before importing numpy
-threads = "16"
-os.environ["OPENBLAS_NUM_THREADS"] = threads
-os.environ["OMP_NUM_THREADS"] = threads
-os.environ["MKL_NUM_THREADS"] = threads
-os.environ["VECLIB_MAXIMUM_THREADS"] = threads
-os.environ["NUMEXPR_NUM_THREADS"] = threads
+os.environ["OPENBLAS_NUM_THREADS"] = max_threads
+os.environ["OMP_NUM_THREADS"] = max_threads
+os.environ["MKL_NUM_THREADS"] = max_threads
+os.environ["VECLIB_MAXIMUM_THREADS"] = max_threads
+os.environ["NUMEXPR_NUM_THREADS"] = max_threads
 
+# Whether to use legacy LHS package (pyDOE). Needed for Python 3.6
+legacy = False
 
 # TODO: Temporary folder path
 
 # Max iterations for optimization
-maxiter = 10
+maxiter = 12
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation
