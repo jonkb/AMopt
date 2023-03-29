@@ -19,11 +19,12 @@ def obj_func(x):
     vprnt(f"f_calls: {f_calls}")
     # Calculate mass from x
     rho = settings.rho
-    num_voxels = np.prod(settings.resolution) # Nx*Ny*Nz
+    # num_voxels = np.prod(settings.resolution) # Nx*Ny*Nz
     volume_voxel = np.prod(settings.voxel_dim) # Volume per voxel = hx*hy*hz
-    mass = np.sum(rho*volume_voxel*num_voxels*x)
-    vprnt(f"Volume of voxel: {volume_voxel}")
-    vprnt(f"Number of voxels: {num_voxels}")
+    mass = np.sum(x * rho * volume_voxel)
+    # mass = np.sum(rho*volume_voxel*num_voxels*x)
+    vprnt(f"Volume per voxel: {volume_voxel}")
+    # vprnt(f"Number of voxels: {num_voxels}")
     vprnt(f"Mass: {mass} grams")
 
     return mass
