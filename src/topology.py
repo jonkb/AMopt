@@ -50,7 +50,7 @@ print("Running GA")
 constraints = (con_func,)
 toc(times) # Start timing GA
 res = GA(obj_func, theBounds, constraints=constraints, it_max=settings.maxiter,
-    pop_size=15, xtol=1e-6, mutation1=0.075, mutation2=0.400, 
+    pop_size=5, xtol=1e-6, mutation1=0.075, mutation2=0.400, 
     verbose=settings.verbose, callback=GAcb)
 res.printall()
 # Tacky fix for compatability

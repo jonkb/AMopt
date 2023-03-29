@@ -12,7 +12,7 @@ verbose = True
 terminal_output = DEVNULL
 
 ## Limit multithreading (useful when running on a large, public computer)
-max_threads = "24"
+max_threads = "16"
 import os
 # Set environment variables to limit multithreading
 # This must be done before importing numpy
@@ -23,12 +23,12 @@ os.environ["VECLIB_MAXIMUM_THREADS"] = max_threads
 os.environ["NUMEXPR_NUM_THREADS"] = max_threads
 
 # Whether to use legacy LHS package (pyDOE). Needed for Python 3.6
-legacy = False
+legacy = True
 
 # TODO: Temporary folder path
 
 # Max iterations for optimization
-maxiter = 12
+maxiter = 4
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation
@@ -36,7 +36,7 @@ import numpy as np
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-resolution = np.array((4, 4, 4))
+resolution = np.array((10, 10, 10))
 # Number of design variables
 nx = np.prod(resolution)
 # voxel dimensions
