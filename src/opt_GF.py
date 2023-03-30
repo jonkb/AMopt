@@ -88,31 +88,77 @@ def find_best(population, popf, popg=None):
     Used by GA.
     """
     if popg is not None:# If constrained
+        # Worst constraint for each point
+        maxg = np.max(popg, axis=1)
         # TODO: This may fail if >1 constraint. np.all?
-        i_feasible = np.where(popg <= 0)[0]
+        i_feasible = np.where(maxg <= 0)[0]
         isfeasible = False
         if i_feasible.size == 0:
             # If none feasible, return closest to feasible
-            g_star = np.min(popg)
+            g_star = popg[ maxg == np.min(maxg) ]
             i_star = np.where(popg == g_star)[0][0]
             f_star = popf[i_star]
             x_star = population[i_star]
         else:
+            isfeasible = True
             # Best of the feasible points
             f_feasible = popf[i_feasible]
             g_feasible = popg[i_feasible]
-            p_feasible = population[i_feasible]
+            x_feasible = population[i_feasible]
             f_star = np.min(f_feasible)
             i_star = np.where(f_feasible == f_star)[0][0]
             g_star = g_feasible[i_star]
-            x_star = p_feasible[i_star]
-            isfeasible = True
+            x_star = x_feasible[i_star]
         return x_star, f_star, g_star, isfeasible
     else:
+        # Unconstrained: pick the point with lowest f
         f_star = np.min(popf)
         i_star = np.where(popf == f_star)[0][0]
         x_star = population[i_star]
         return x_star, f_star, None, None
+
+def tournament(population, popf, popg=None):
+    """ Perform tournament selection.
+    Return an array of winner indices
+
+    Used by GA
+    """
+    N_pop = population.shape[0]
+    N_pairs_tourn = int(np.ceil(N_pop/2))
+    N_pairs_breed = int(np.ceil(N_pairs_tourn/2))
+    i_list = np.arange(N_pop)
+    rng.shuffle(i_list) # Shuffles in-place
+    # Create random pairs, repeating one if N_pop is odd
+    pairs = np.resize(i_list, (N_pairs_tourn,2))
+    winners = np.zeros(N_pairs_tourn, dtype=int)
+    # NOTE: This could likely be vectorized, but it's ok for now
+    for i_pair, pair in enumerate(pairs):
+        if popg is not None:
+            # Follow logic from book 7.6.3
+            gmax_p0 = np.max(popg[pair[0]])
+            gmax_p1 = np.max(popg[pair[1]])
+            if gmax_p0 > 0 and gmax_p1 <= 0:
+                # p1 is feasible, p0 isn't --> prefer p1
+                winners[i_pair] = pair[1]
+            elif gmax_p1 > 0 and gmax_p0 <= 0:
+                # p0 is feasible, p1 isn't --> prefer p0
+                winners[i_pair] = pair[0]
+            elif gmax_p0 > 0 and gmax_p1 > 0:
+                # Neither is feasible --> prefer the one that has lower g
+                winners[i_pair] = pair[0] if gmax_p0 < gmax_p1 else pair[1]
+            else:
+                # Both are feasible --> prefer the one that has lower f
+                f_p0 = popf[pair[0]]
+                f_p1 = popf[pair[1]]
+                winners[i_pair] = pair[0] if f_p0 < f_p1 else pair[1]
+        else:
+            # Unconstrained --> prefer the one that has lower f
+            f_p0 = popf[pair[0]]
+            f_p1 = popf[pair[1]]
+            winners[i_pair] = pair[0] if f_p0 < f_p1 else pair[1]
+    # Create parent pairs, repeating one if N_pairs_tourn is odd
+    parents = np.resize(winners, (N_pairs_breed,2))
+    return winners, parents
 
 def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8, 
     mutation1=0.05, mutation2=0.40, elitist=True, figax=None, verbose=False,
@@ -163,13 +209,10 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
         population = qmc.scale(sample, lbounds, ubounds)
     # Other setup
     N_g = len(constraints)
-    N_pairs_tourn = int(np.ceil(N_pop/2))
-    N_pairs_breed = int(np.ceil(N_pairs_tourn/2))
-    indices = np.arange(N_pop)
     it = 0
     nfev = 0
     ngev = 0
-    maxvar = xtol * 2
+    maxvar = np.max(np.var(population, axis=0))
 
     ## Plot population (if ax provided)
     if figax is not None:
@@ -209,57 +252,28 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
 
     while (it < it_max) and (maxvar > xtol):
         ## Tournament selection
-        i_list = np.copy(indices)
-        rng.shuffle(i_list) # Shuffles in-place
-        # Create random pairs, repeating one if N_pop is odd
-        pairs = np.resize(i_list, (N_pairs_tourn,2))
-        winners = np.zeros(N_pairs_tourn, dtype=int)
-        # NOTE: This could likely be vectorized, but it's ok for now
-        for i_pair, pair in enumerate(pairs):
-            if N_g > 0:
-                # Follow logic from book 7.6.3
-                gmax_p0 = np.max(popg[pair[0]])
-                gmax_p1 = np.max(popg[pair[1]])
-                if gmax_p0 > 0 and gmax_p1 <= 0:
-                    # p1 is feasible, p0 isn't --> prefer p1
-                    winners[i_pair] = pair[1]
-                elif gmax_p1 > 0 and gmax_p0 <= 0:
-                    # p0 is feasible, p1 isn't --> prefer p0
-                    winners[i_pair] = pair[0]
-                elif gmax_p0 > 0 and gmax_p1 > 0:
-                    # Neither is feasible --> prefer the one that has lower g
-                    winners[i_pair] = pair[0] if gmax_p0 < gmax_p1 else pair[1]
-                else:
-                    # Both are feasible --> prefer the one that has lower f
-                    f_p0 = popf[pair[0]]
-                    f_p1 = popf[pair[1]]
-                    winners[i_pair] = pair[0] if f_p0 < f_p1 else pair[1]
-            else:
-                # Unconstrained --> prefer the one that has lower f
-                f_p0 = popf[pair[0]]
-                f_p1 = popf[pair[1]]
-                winners[i_pair] = pair[0] if f_p0 < f_p1 else pair[1]
-        # Create parent pairs, repeating one if N_pairs_tourn is odd
-        parents = np.resize(winners, (N_pairs_breed,2))
+        # Perform 2 tournaments and pull 2 children from each parent pair
+        winners1, parents1 = tournament(population, popf, popg)
+        winners2, parents2 = tournament(population, popf, popg)
+        winners = np.concatenate([winners1, winners2])
+        parents = np.concatenate([parents1, parents2])
         # Lowest function call among winners. Not necessarily feasible.
         fbest = np.min(popf[winners])
 
         ## Create next generation
         new_pop = np.zeros_like(population)
-        i_np = 0
-        while i_np < (N_pop-1 if elitist else N_pop):
-            # I did this instead of a for loop b/c we may not use every couple
-            #   twice, due to odd numbers.
+        for i_np in range(N_pop-1 if elitist else N_pop):
             # If elitist, leave the last entry in new_pop for the best from the 
             #   previous generation.
-            couple = parents[int(np.floor(i_np/4))]
+            # This next line makes it so each parent couple makes two children.
+            #   We may not use every couple twice, due to odd numbers.
+            couple = parents[int(np.floor(i_np/2))]
             p0 = population[couple[0]]
             p1 = population[couple[1]]
             f0 = popf[couple[0]]
             f1 = popf[couple[1]]
             new_pop[i_np] = breed(p0, p1, f0, f1, fbest=fbest, 
                 mutation1=mutation1, mutation2=mutation2)
-            i_np += 1
         if elitist:
             # Not necessarily the same x as fbest from above
             xbest, *_ = find_best(population, popf, popg)
