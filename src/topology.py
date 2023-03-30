@@ -52,7 +52,9 @@ def GAcb(data):
 
 print("Running GA")
 bounds = [(0, 1)] * settings.nx
-constraints = (con_func,)
+# my GA expects a tuple of scalar functions
+g_scalar = lambda x: con_func(x)[0]
+constraints = (g_scalar,)
 toc(times) # Start timing GA
 res = GA(obj_func, bounds, constraints=constraints, it_max=settings.maxiter, 
     pop_size=settings.pop_size, xtol=settings.xtol, verbose=settings.verbose, 
