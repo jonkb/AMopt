@@ -27,8 +27,14 @@ legacy = False
 
 # TODO: Temporary folder path
 
+## Optimization options
 # Max iterations for optimization
 maxiter = 12
+# GA options
+pop_size = 5 # N_pop = pop_size * N_x
+mutation1 = 0.10
+mutation2 = 0.50
+xtol = 1e-6
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation

@@ -11,22 +11,22 @@ import numpy as np
 # start timer
 times = tic()
 
-## Initial guess
+## Initial guess (for local methods)
 # x0 = x0_hyperboloid()
 # x0 = x0_cube()
 
 ## SciPy minimize
 # Scipy.optimize.minimize settings
-theConstraints = NonlinearConstraint(con_func, -np.inf, 0.0)#, finite_diff_rel_step=[1e8])
-theBounds = [(0, 1)] * settings.nx
-theOptions = {'maxiter':settings.maxiter}#, 'finite_diff_rel_step':[1e6]}
-optimality = []
-def callback(xk, res):
-    """
-    callback function for minimize
-    """
-    optimality.append(res.optimality)
-    print(f"optimality: {res.optimality}")
+# theConstraints = NonlinearConstraint(con_func, -np.inf, 0.0)#, finite_diff_rel_step=[1e8])
+# theBounds = [(0, 1)] * settings.nx
+# theOptions = {'maxiter':settings.maxiter}#, 'finite_diff_rel_step':[1e6]}
+# optimality = []
+# def callback(xk, res):
+#     """
+#     callback function for minimize
+#     """
+#     optimality.append(res.optimality)
+#     print(f"optimality: {res.optimality}")
 #res = minimize(obj_func, x0, constraints=theConstraints, method='trust-constr', 
 #    bounds=theBounds, tol=1e-5, options=theOptions, callback=callback)
 
@@ -47,13 +47,16 @@ def GAcb(data):
     toc(times, f"Iteration {data.it}")
     # Save the population to file
     np.savetxt(f"population_it{data.it}.txt", data.population)
+    np.savetxt(f"popf_it{data.it}.txt", data.popf)
+    np.savetxt(f"popg_it{data.it}.txt", data.popg)
 
 print("Running GA")
+bounds = [(0, 1)] * settings.nx
 constraints = (con_func,)
 toc(times) # Start timing GA
-res = GA(obj_func, theBounds, constraints=constraints, it_max=settings.maxiter,
-    pop_size=15, xtol=1e-6, mutation1=0.075, mutation2=0.400, 
-    verbose=settings.verbose, callback=GAcb)
+res = GA(obj_func, bounds, constraints=constraints, it_max=settings.maxiter, 
+    pop_size=settings.pop_size, xtol=settings.xtol, verbose=settings.verbose, 
+    mutation1=settings.mutation1, mutation2=settings.mutation2, callback=GAcb)
 res.printall()
 # Tacky fix for compatability
 res.x = res.x_star
@@ -80,7 +83,7 @@ from obj_func import f_calls # NOTE: Must be imported at this time to work
 from con_func import g_calls
 print(f"Number of function calls: {f_calls}")
 print(f"Number of constraint calls: {g_calls}")
-print(f"Optimality: {optimality}")
+# print(f"Optimality: {optimality}")
 toc(times, msg=f"\n\nTotal optimization time for {settings.maxiter} Iterations:", total=True)
 print("--- -- -- -- -- -- -- -- ---\n\n")
 
