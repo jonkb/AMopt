@@ -166,7 +166,7 @@ def tournament(population, popf, popg=None):
     parents = np.resize(winners, (N_pairs_breed,2))
     return winners, parents
 
-def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8, 
+def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol=1e-8, 
     mutation1=0.05, mutation2=0.40, elitist=True, figax=None, verbose=False,
     callback=None):
     """ Genetic Algorithm Optimization

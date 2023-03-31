@@ -31,7 +31,7 @@ legacy = True
 # Max iterations for optimization
 maxiter = 4
 # GA options
-pop_size = 1 # N_pop = pop_size * N_x
+pop_size = 5 # N_pop = pop_size * N_x
 mutation1 = 0.10
 mutation2 = 0.50
 xtol = 1e-6
