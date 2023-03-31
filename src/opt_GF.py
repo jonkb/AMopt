@@ -52,16 +52,22 @@ def breed(p1, p2, f1, f2, fbest=0, fscale=1., mutation1=0.05,
         question to figure out.
     """
     assert p2.size == p1.size, "p1 & p2 must be of the same size"
+    N_x = p1.size
     # inverse fitness: how bad is the point. fi >= 0
     fi1 = f1 - fbest
     fi2 = f2 - fbest
     ## Generate mutated parents (p1' & p2')
     # Variances are proportional to the distance btw parents as well as how
     #   much worse that parent is than the best
-    dist = np.linalg.norm(p2-p1)
-    v1 = fi1 / fscale * mutation1 * dist
-    v2 = fi2 / fscale * mutation1 * dist
-    assert (v1 >= 0) and (v2 >= 0), "Negative variance"
+    # 2-norm / sqrt(N) is a rough approximation of N-norm that doesn't blow up
+    #   to infinity for large N.
+    dist = np.linalg.norm(p2-p1, 2) / np.sqrt(N_x)
+    # dist = np.linalg.norm(p2-p1, N_x)
+    # dist = np.abs(p2-p1)
+    v1 = fi1 / fscale * dist * mutation1 / N_x
+    v2 = fi2 / fscale * dist * mutation1 / N_x
+    assert np.all(v1 >= 0) and np.all(v2 >= 0), (f"Negative variance. fi1={fi1}"
+        f", fi2={fi2}, dist={dist}")
     p1p = rng.normal(p1, v1)
     p2p = rng.normal(p2, v2)
     # DEBUGGING
@@ -328,8 +334,9 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
     
     # Find & return best point
     xbest, fbest, gbest, isfeasible = find_best(population, popf, popg)
-    msg += ("Feasible point found. " if isfeasible else 
-        "No feasible point found. ")
+    if N_g > 0:
+        msg += ("Feasible point found. " if isfeasible else 
+            "No feasible point found. ")
     return optsol(xbest, fbest, g_star=gbest, it=it, msg=msg, nfev=nfev, 
         ngev=ngev)
 

@@ -52,7 +52,7 @@ def GAcb(data):
 
 print("Running GA")
 bounds = [(0, 1)] * settings.nx
-constraints = (con_func,)
+constraints = (lambda x: con_func(x)[0],)
 toc(times) # Start timing GA
 res = GA(obj_func, bounds, constraints=constraints, it_max=settings.maxiter, 
     pop_size=settings.pop_size, xtol=settings.xtol, verbose=settings.verbose, 

@@ -29,9 +29,9 @@ legacy = True
 
 ## Optimization options
 # Max iterations for optimization
-maxiter = 12
+maxiter = 4
 # GA options
-pop_size = 5 # N_pop = pop_size * N_x
+pop_size = 1 # N_pop = pop_size * N_x
 mutation1 = 0.10
 mutation2 = 0.50
 xtol = 1e-6
@@ -42,7 +42,8 @@ import numpy as np
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-resolution = np.array((10, 10, 10))
+# resolution = np.array((10, 10, 10))
+resolution = np.array((4, 4, 4))
 # Number of design variables
 nx = np.prod(resolution)
 # voxel dimensions
