@@ -33,10 +33,10 @@ def con_func(x):
     # Pull max stress from max_stress.txt
     try:
         max_stress = np.loadtxt(f'{tag}_max_stress.txt', dtype=float)
-        vprnt(f"Max stress: {max_stress}")
+        print(f"g_calls: {g_calls}, Max stress: {max_stress}")
     except:
         max_stress = settings.stress_limit*300
-        vprnt(f"Error: unable to load max stress")
+        print(f"Error: unable to load max stress")
     
     g0 = np.zeros(1)
     g0[0] = max_stress - settings.stress_limit

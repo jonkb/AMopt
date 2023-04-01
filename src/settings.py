@@ -8,7 +8,7 @@ from subprocess import DEVNULL
 
 ## General settings
 # Whether to print to console when calling the util.vprnt function
-verbose = True
+verbose = False
 terminal_output = DEVNULL
 
 ## Limit multithreading (useful when running on a large, public computer)
@@ -29,9 +29,9 @@ legacy = True
 
 ## Optimization options
 # Max iterations for optimization
-maxiter = 4
+maxiter = 8
 # GA options
-pop_size = 5 # N_pop = pop_size * N_x
+pop_size = 15 # N_pop = pop_size * N_x
 mutation1 = 0.10
 mutation2 = 0.50
 xtol = 1e-6
@@ -43,7 +43,7 @@ import numpy as np
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
 # resolution = np.array((10, 10, 10))
-resolution = np.array((4, 4, 4))
+resolution = np.array((5, 5, 5))
 # Number of design variables
 nx = np.prod(resolution)
 # voxel dimensions

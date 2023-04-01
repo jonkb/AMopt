@@ -42,7 +42,7 @@ from opt_GF import GA
 
 def GAcb(data):
     # Delete unneeded temporary files after every iteration
-    file_cleanup(["stl", "msh", "mesh"])
+    file_cleanup(["stl", "msh", "mesh", "vtk"])
     # Print the time for this iteration
     toc(times, f"Iteration {data.it}")
     # Save the population to file
