@@ -55,7 +55,7 @@ bounds = [(0, 1)] * settings.nx
 constraints = (lambda x: con_func(x)[0],)
 toc(times) # Start timing GA
 res = GA(obj_func, bounds, constraints=constraints, it_max=settings.maxiter, 
-    pop_size=settings.pop_size, xtol=settings.xtol, verbose=settings.verbose, 
+    pop_size=settings.pop_size, xtol=settings.xtol, verbose=True,
     mutation1=settings.mutation1, mutation2=settings.mutation2, callback=GAcb)
 res.printall()
 # Tacky fix for compatability

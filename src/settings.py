@@ -31,9 +31,9 @@ legacy = True
 # Max iterations for optimization
 maxiter = 8
 # GA options
-pop_size = 15 # N_pop = pop_size * N_x
+pop_size = 16 # N_pop = pop_size * N_x
 mutation1 = 0.10
-mutation2 = 0.50
+mutation2 = 0.40
 xtol = 1e-6
 
 ## Cube dimensions & Spacing
