@@ -52,16 +52,22 @@ def breed(p1, p2, f1, f2, fbest=0, fscale=1., mutation1=0.05,
         question to figure out.
     """
     assert p2.size == p1.size, "p1 & p2 must be of the same size"
+    N_x = p1.size
     # inverse fitness: how bad is the point. fi >= 0
     fi1 = f1 - fbest
     fi2 = f2 - fbest
     ## Generate mutated parents (p1' & p2')
     # Variances are proportional to the distance btw parents as well as how
     #   much worse that parent is than the best
-    dist = np.linalg.norm(p2-p1)
-    v1 = fi1 / fscale * mutation1 * dist
-    v2 = fi2 / fscale * mutation1 * dist
-    assert (v1 >= 0) and (v2 >= 0), "Negative variance"
+    # 2-norm / sqrt(N) is a rough approximation of N-norm that doesn't blow up
+    #   to infinity for large N.
+    dist = np.linalg.norm(p2-p1, 2) / np.sqrt(N_x)
+    # dist = np.linalg.norm(p2-p1, N_x)
+    # dist = np.abs(p2-p1)
+    v1 = fi1 / fscale * dist * mutation1 / N_x
+    v2 = fi2 / fscale * dist * mutation1 / N_x
+    assert np.all(v1 >= 0) and np.all(v2 >= 0), (f"Negative variance. fi1={fi1}"
+        f", fi2={fi2}, dist={dist}")
     p1p = rng.normal(p1, v1)
     p2p = rng.normal(p2, v2)
     # DEBUGGING
@@ -160,9 +166,9 @@ def tournament(population, popf, popg=None):
     parents = np.resize(winners, (N_pairs_breed,2))
     return winners, parents
 
-def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8, 
+def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol=1e-8, 
     mutation1=0.05, mutation2=0.40, elitist=True, figax=None, verbose=False,
-    callback=None):
+    callback=None, warm_start=None):
     """ Genetic Algorithm Optimization
 
     Sampling: LHS
@@ -192,6 +198,10 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
     elitist (bool): Whether to forcibly keep the best point.
     verbose (bool): Whether to print a message every iteration.
     callback (function): A function to be called after every iteration.
+    warm_start (dict): Warm start population. Dictionary with the following:
+        "population" (N_pop x N_x): initial population
+        "popf" (N_pop x 1): objective function evaluated at population
+        "popf" (N_pop x N_g): constraint function evaluated at population
     """
 
     ## Generate initial population (LHS)
@@ -200,7 +210,13 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
     ubounds = bounds[:,1]
     N_x = bounds.shape[0]
     N_pop = pop_size * N_x
-    if settings.legacy:
+    if warm_start is not None:
+        population = warm_start["population"]
+        # Use the given population as the starting population
+        assert population.shape == (N_pop, N_x), ("Population passed with"
+            " warm_start does not match expected dimensions"
+            f", ({N_pop},{N_x})")
+    elif settings.legacy:
         sample = lhs(N_x, N_pop) # Uniform btw 0 and 1
         population = sample * (ubounds-lbounds) + lbounds
     else:
@@ -220,14 +236,20 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
         figax[0].canvas.draw()
         input("Press any key to continue")
 
-    ## Evaluate f & g for population
-    popf = np.array([f(x) for x in population])
-    nfev += N_pop
-    if N_g > 0:
-        popg = np.array([[g(x) for g in constraints] for x in population])
-        ngev += N_pop * N_g
+    ## Evaluate f & g for initial population
+    if (warm_start is not None) and ("popf" in warm_start):
+        popf = warm_start["popf"]
     else:
-        popg = None # Initialize to not break things later
+        popf = np.array([f(x) for x in population])
+        nfev += N_pop
+    if (warm_start is not None) and ("popg" in warm_start):
+        popg = warm_start["popg"].reshape(N_pop, N_g)
+    else:
+        if N_g > 0:
+            popg = np.array([[g(x) for g in constraints] for x in population])
+            ngev += N_pop * N_g
+        else:
+            popg = None # Still initialize to not break things later
     
     # Print status after initial sample (Iteration 0)
     if (callback is not None) or verbose:
@@ -328,8 +350,9 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol = 1e-8,
     
     # Find & return best point
     xbest, fbest, gbest, isfeasible = find_best(population, popf, popg)
-    msg += ("Feasible point found. " if isfeasible else 
-        "No feasible point found. ")
+    if N_g > 0:
+        msg += ("Feasible point found. " if isfeasible else 
+            "No feasible point found. ")
     return optsol(xbest, fbest, g_star=gbest, it=it, msg=msg, nfev=nfev, 
         ngev=ngev)
 

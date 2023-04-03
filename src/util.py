@@ -30,7 +30,7 @@ def toc(times, msg=None, total=False):
     times.append(time.time())
     if msg is not None:
         t = times[-1] - times[0] if total else times[-1] - times[-2]
-        vprnt(f"{msg} time: {t:.6f} s")
+        print(f"{msg} time: {t:.6f} s")
 
 def file_cleanup(types, dirpath=None):
     """ Remove all files of the given types from a directory.

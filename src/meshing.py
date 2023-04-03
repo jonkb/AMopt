@@ -38,7 +38,7 @@ def x2mesh(x, tag, dim="cube", out_format="mesh"):
         raise Exception("Invalid mesh format out_format")
 
     # Start timing
-    times = tic()
+    # times = tic()
 
     # Unflatten x
     N = x.size
@@ -54,21 +54,21 @@ def x2mesh(x, tag, dim="cube", out_format="mesh"):
     # Convert rho to an isosurf
     vprnt("Convert density function to isosurface")
     surf = rho2isosurf(rho)
-    toc(times, "Converting to isosurface")
+    # toc(times, "Converting to isosurface")
 
     # Convert rho to an stl
     fn_stl = f"{tag}.stl"
     vprnt("Converting isosurface to stl")
     isosurf2stl(surf, fn_stl)
     vprnt(f"Saved to {fn_stl}")
-    toc(times, "Converting & saving to stl")
+    # toc(times, "Converting & saving to stl")
 
     # Convert stl to gmsh mesh
     fn_msh = f"{tag}.msh"
     vprnt("Convert stl to volume and mesh")
     stl2msh(fn_stl, fn_msh)
     vprnt(f"Saved to {fn_msh}")
-    toc(times, "Meshing")
+    # toc(times, "Meshing")
 
     # Convert to .mesh or .vtk
     if out_format in ("mesh", "vtk"):
@@ -76,10 +76,10 @@ def x2mesh(x, tag, dim="cube", out_format="mesh"):
         vprnt(f"Convert .msh to .{out_format}")
         msh2sfepy(fn_msh, fn_sfepy)
         vprnt(f"Saved to {fn_sfepy}")
-        toc(times, f"Converting to .{out_format}")
+        # toc(times, f"Converting to .{out_format}")
 
     # Report total time
-    toc(times, f"Total x->{out_format}", total=True)
+    # toc(times, f"Total x->{out_format}", total=True)
 
 def rho2isosurf(rho, rho_cutoff=0.5):
     """ Take a discrete density function rho and convert it to an isosurface

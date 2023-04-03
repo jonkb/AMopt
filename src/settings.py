@@ -8,11 +8,11 @@ from subprocess import DEVNULL
 
 ## General settings
 # Whether to print to console when calling the util.vprnt function
-verbose = True
+verbose = False
 terminal_output = DEVNULL
 
 ## Limit multithreading (useful when running on a large, public computer)
-max_threads = "24"
+max_threads = "16"
 import os
 # Set environment variables to limit multithreading
 # This must be done before importing numpy
@@ -28,12 +28,20 @@ legacy = False
 # TODO: Temporary folder path
 
 ## Optimization options
+# Methods: ["spmin" (SciPy minimize), "spDE" (SciPy differential_evolution), 
+#   "jGA" (Jon's Genetic Algorithm), "jIP" (Jon's Interior Penalty)]
+method = "jGA"
 # Max iterations for optimization
-maxiter = 12
+maxiter = 8
+# Warm start initial population txt file (from numpy.savetxt)
+# warm_pop = None # LHS sample
+warm_pop = None #"population_init.txt"
+warm_popf = "popf_init.txt" # obj_fun(warm_pop)
+warm_popg = "popg_init.txt" # con_fun(warm_pop)
 # GA options
-pop_size = 5 # N_pop = pop_size * N_x
+pop_size = 16 # N_pop = pop_size * N_x
 mutation1 = 0.10
-mutation2 = 0.50
+mutation2 = 0.40
 xtol = 1e-6
 
 ## Cube dimensions & Spacing
@@ -42,7 +50,7 @@ import numpy as np
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-resolution = np.array((4, 4, 4))
+resolution = np.array((8, 8, 8))
 # Number of design variables
 nx = np.prod(resolution)
 # voxel dimensions
