@@ -28,8 +28,16 @@ legacy = True
 # TODO: Temporary folder path
 
 ## Optimization options
+# Methods: ["spmin" (SciPy minimize), "spDE" (SciPy differential_evolution), 
+#   "jGA" (Jon's Genetic Algorithm), "jIP" (Jon's Interior Penalty)]
+method = "jGA"
 # Max iterations for optimization
 maxiter = 8
+# Warm start initial population txt file (from numpy.savetxt)
+# warm_pop = None # LHS sample
+warm_pop = "population_init.txt"
+warm_popf = "popf_init.txt" # obj_fun(warm_pop)
+warm_popg = "popg_init.txt" # con_fun(warm_pop)
 # GA options
 pop_size = 16 # N_pop = pop_size * N_x
 mutation1 = 0.10
