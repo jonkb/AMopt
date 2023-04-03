@@ -17,8 +17,8 @@ times = tic()
 
 ## SciPy minimize
 # Scipy.optimize.minimize settings
-# theConstraints = NonlinearConstraint(con_func, -np.inf, 0.0)#, finite_diff_rel_step=[1e8])
-# theBounds = [(0, 1)] * settings.nx
+theConstraints = NonlinearConstraint(con_func, -np.inf, 0.0)#, finite_diff_rel_step=[1e8])
+theBounds = [(0, 1)] * settings.nx
 # theOptions = {'maxiter':settings.maxiter}#, 'finite_diff_rel_step':[1e6]}
 # optimality = []
 # def callback(xk, res):
@@ -31,35 +31,43 @@ times = tic()
 #    bounds=theBounds, tol=1e-5, options=theOptions, callback=callback)
 
 ## SciPy differential evolution
-# res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
-#     tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
-#res = differential_evolution(obj_func, bounds=theBounds, popsize=50,
-#    constraints=theConstraints, tol=5e-2, disp=settings.verbose, 
-#    maxiter=settings.maxiter, polish=True)
-
-## Jon's GA
-from opt_GF import GA
-
-def GAcb(data):
+def callback(xk, convergence):
     # Delete unneeded temporary files after every iteration
     file_cleanup(["stl", "msh", "mesh", "vtk"])
     # Print the time for this iteration
-    toc(times, f"Iteration {data.it}")
-    # Save the population to file
-    np.savetxt(f"population_it{data.it}.txt", data.population)
-    np.savetxt(f"popf_it{data.it}.txt", data.popf)
-    np.savetxt(f"popg_it{data.it}.txt", data.popg)
+    toc(times, f"DE iteration")
+    print(f"convergence: {convergence}")
 
-print("Running GA")
-bounds = [(0, 1)] * settings.nx
-constraints = (lambda x: con_func(x)[0],)
-toc(times) # Start timing GA
-res = GA(obj_func, bounds, constraints=constraints, it_max=settings.maxiter, 
-    pop_size=settings.pop_size, xtol=settings.xtol, verbose=True,
-    mutation1=settings.mutation1, mutation2=settings.mutation2, callback=GAcb)
-res.printall()
-# Tacky fix for compatability
-res.x = res.x_star
+# res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
+#     tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
+toc(times) # Start timing DE
+res = differential_evolution(obj_func, bounds=theBounds, tol=settings.xtol,
+    popsize=settings.pop_size, constraints=theConstraints, disp=True,
+    maxiter=settings.maxiter, polish=False, callback=callback)
+
+## Jon's GA
+#from opt_GF import GA
+#
+#def GAcb(data):
+#    # Delete unneeded temporary files after every iteration
+#    file_cleanup(["stl", "msh", "mesh", "vtk"])
+#    # Print the time for this iteration
+#    toc(times, f"Iteration {data.it}")
+#    # Save the population to file
+#    np.savetxt(f"population_it{data.it}.txt", data.population)
+#    np.savetxt(f"popf_it{data.it}.txt", data.popf)
+#    np.savetxt(f"popg_it{data.it}.txt", data.popg)
+#
+#print("Running GA")
+#bounds = [(0, 1)] * settings.nx
+#constraints = (lambda x: con_func(x)[0],)
+#toc(times) # Start timing GA
+#res = GA(obj_func, bounds, constraints=constraints, it_max=settings.maxiter, 
+#    pop_size=settings.pop_size, xtol=settings.xtol, verbose=True,
+#    mutation1=settings.mutation1, mutation2=settings.mutation2, callback=GAcb)
+#res.printall()
+## Tacky fix for compatability
+#res.x = res.x_star
 
 ## Jon's IP constrained optimization
 # import opt_constr
