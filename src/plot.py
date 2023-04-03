@@ -8,6 +8,9 @@ import settings
 
 def it_progress():
     """ Make whisker plots of f & g at each iteration
+
+    TODO: Could annotate with location of best point, 
+        using opt_GF.find_best
     """
     f_vals = [] #(iteration, pt)
     g_vals = []
