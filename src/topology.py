@@ -19,11 +19,7 @@ x0 = None
 
 # Load initial population for warm start (for global methods)
 if settings.warm_pop is None:
-    warm_start = {
-        "population": None,
-        "popf": None,
-        "popg": None
-    }
+    warm_start = None
 else:
     pop_init = np.loadtxt(settings.warm_pop, dtype=float)
     popf_init = (np.loadtxt(settings.warm_popf, dtype=float) 
@@ -64,13 +60,18 @@ if settings.method == "spDE":
         toc(times, f"DE iteration")
         print(f"convergence: {convergence}")
 
+    if warm_start is None:
+        init_pop = "latinhypercube"
+    else:
+        init_pop = warm_start["population"]
+
     # res = differential_evolution(obj_func, bounds=theBounds, constraints=theConstraints,
     #     tol=5e-2, disp=settings.verbose, maxiter=settings.maxiter, polish=False)
     toc(times) # Start timing DE
     res = differential_evolution(obj_func, bounds=theBounds, tol=settings.xtol,
         popsize=settings.pop_size, constraints=theConstraints, disp=True,
         maxiter=settings.maxiter, polish=settings.polish, callback=callback, 
-        init=warm_start["population"])
+        init=init_pop)
 
 if settings.method == "jGA":
     ## Jon's GA
