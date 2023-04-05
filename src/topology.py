@@ -19,7 +19,11 @@ x0 = None
 
 # Load initial population for warm start (for global methods)
 if settings.warm_pop is None:
-    warm_start = None
+    warm_start = {
+        "population": None,
+        "popf": None,
+        "popg": None
+    }
 else:
     pop_init = np.loadtxt(settings.warm_pop, dtype=float)
     popf_init = (np.loadtxt(settings.warm_popf, dtype=float) 
