@@ -237,12 +237,12 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol=1e-8,
         input("Press any key to continue")
 
     ## Evaluate f & g for initial population
-    if (warm_start is not None) and ("popf" in warm_start):
+    if (warm_start is not None) and ("popf" in warm_start) and (warm_start["popf"] is not None):
         popf = warm_start["popf"]
     else:
         popf = np.array([f(x) for x in population])
         nfev += N_pop
-    if (warm_start is not None) and ("popg" in warm_start):
+    if (warm_start is not None) and ("popg" in warm_start) and (warm_start["popg"] is not None):
         popg = warm_start["popg"].reshape(N_pop, N_g)
     else:
         if N_g > 0:

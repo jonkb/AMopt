@@ -14,7 +14,7 @@ terminal_output = DEVNULL
 clean_up_each = True
 
 ## Limit multithreading (useful when running on a large, public computer)
-max_threads = "16"
+max_threads = "8"
 import os
 # Set environment variables to limit multithreading
 # This must be done before importing numpy
@@ -32,19 +32,20 @@ legacy = False
 ## Optimization options
 # Methods: ["spmin" (SciPy minimize), "spDE" (SciPy differential_evolution), 
 #   "jGA" (Jon's Genetic Algorithm), "jIP" (Jon's Interior Penalty)]
-method = "jGA"
+method = "spDE"
 # Max iterations for optimization
 maxiter = 8
 # Warm start initial population txt file (from numpy.savetxt)
 # warm_pop = None # LHS sample
 warm_pop = None #"population_init.txt"
-warm_popf = "popf_init.txt" # obj_fun(warm_pop)
-warm_popg = "popg_init.txt" # con_fun(warm_pop)
-# GA options
+warm_popf = None #"popf_init.txt" # obj_fun(warm_pop)
+warm_popg = None #"popg_init.txt" # con_fun(warm_pop)
+# GA options (Some apply to DE)
 pop_size = 16 # N_pop = pop_size * N_x
 mutation1 = 0.10
 mutation2 = 0.40
 xtol = 1e-6
+polish = True
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation

@@ -65,7 +65,7 @@ if settings.method == "spDE":
     toc(times) # Start timing DE
     res = differential_evolution(obj_func, bounds=theBounds, tol=settings.xtol,
         popsize=settings.pop_size, constraints=theConstraints, disp=True,
-        maxiter=settings.maxiter, polish=False, callback=callback, 
+        maxiter=settings.maxiter, polish=settings.polish, callback=callback, 
         init=warm_start["population"])
 
 if settings.method == "jGA":
