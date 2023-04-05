@@ -41,6 +41,10 @@ def con_func(x):
     g0 = np.zeros(1)
     g0[0] = max_stress - settings.stress_limit
 
+    # Clean up mesh files
+    if settings.clean_up_each:
+        file_cleanup(["stl", "msh", "mesh", "vtk"], tag=tag)
+
     return g0
     
 if __name__ == "__main__":

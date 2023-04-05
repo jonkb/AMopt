@@ -32,13 +32,22 @@ def toc(times, msg=None, total=False):
         t = times[-1] - times[0] if total else times[-1] - times[-2]
         print(f"{msg} time: {t:.6f} s")
 
-def file_cleanup(types, dirpath=None):
+def file_cleanup(types, tag=None, dirpath=None):
     """ Remove all files of the given types from a directory.
     Default directory: os.getcwd()
+
+    if tag is provided, only delete files like {tag}.{type}
     """
     if dirpath is None:
         dirpath = os.getcwd()
-    for filename in os.listdir(dirpath):
-        if os.path.isfile(os.path.join(dirpath, filename)):
-            if any([filename.endswith('.' + ext) for ext in types]):
-                os.remove(os.path.join(dirpath, filename))
+    if tag is not None:
+        for type in types:
+            filename = f"{tag}.{type}"
+            filepath = os.path.join(dirpath, filename)
+            if os.path.exists(filepath):
+                os.remove(filepath)
+    else:
+        for filename in os.listdir(dirpath):
+            if os.path.isfile(os.path.join(dirpath, filename)):
+                if any([filename.endswith('.' + ext) for ext in types]):
+                    os.remove(os.path.join(dirpath, filename))

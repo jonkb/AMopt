@@ -10,6 +10,8 @@ from subprocess import DEVNULL
 # Whether to print to console when calling the util.vprnt function
 verbose = False
 terminal_output = DEVNULL
+# Whether to delete mesh files after every function call
+clean_up_each = True
 
 ## Limit multithreading (useful when running on a large, public computer)
 max_threads = "16"
