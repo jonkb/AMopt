@@ -22,6 +22,7 @@ if settings.warm_pop is None:
     warm_start = None
 else:
     pop_init = np.loadtxt(settings.warm_pop, dtype=float)
+    x0 = pop_init # For local methods
     popf_init = (np.loadtxt(settings.warm_popf, dtype=float) 
         if settings.warm_popf is not None else None)
     popg_init = (np.loadtxt(settings.warm_popg, dtype=float) 
