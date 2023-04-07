@@ -25,14 +25,14 @@ os.environ["VECLIB_MAXIMUM_THREADS"] = max_threads
 os.environ["NUMEXPR_NUM_THREADS"] = max_threads
 
 # Whether to use legacy LHS package (pyDOE). Needed for Python 3.6
-legacy = False
+legacy = True
 
 # TODO: Temporary folder path
 
 ## Optimization options
 # Methods: ["spmin" (SciPy minimize), "spDE" (SciPy differential_evolution), 
 #   "jGA" (Jon's Genetic Algorithm), "jIP" (Jon's Interior Penalty)]
-method = "spDE"
+method = "jGA"
 # Max iterations for optimization
 maxiter = 8
 # Warm start initial population txt file (from numpy.savetxt)
@@ -40,11 +40,14 @@ maxiter = 8
 warm_pop = None #"population_init.txt"
 warm_popf = None #"popf_init.txt" # obj_fun(warm_pop)
 warm_popg = None #"popg_init.txt" # con_fun(warm_pop)
-# GA options (Some apply to DE)
-pop_size = 16 # N_pop = pop_size * N_x
+## GF options
+pop_size = 1 # N_pop = pop_size * N_x
+xtol = 1e-6
+# GA options
 mutation1 = 0.10
 mutation2 = 0.40
-xtol = 1e-6
+anneal = True
+# DE options
 polish = True
 
 ## Cube dimensions & Spacing
@@ -53,7 +56,7 @@ import numpy as np
 # Cube side lengths (doesn't need to be an actual cube)
 side_lengths = np.array((20, 20, 20))
 # Number of voxels in each direction (doesn't need to be equal)
-resolution = np.array((8, 8, 8))
+resolution = np.array((2, 2, 1))
 # Number of design variables
 nx = np.prod(resolution)
 # voxel dimensions

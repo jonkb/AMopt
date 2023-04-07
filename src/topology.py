@@ -80,7 +80,8 @@ if settings.method == "jGA":
 
     def GAcb(data):
         # Delete unneeded temporary files after every iteration
-        file_cleanup(["stl", "msh", "mesh", "vtk"])
+        if not settings.clean_up_each:
+            file_cleanup(["stl", "msh", "mesh", "vtk"])
         # Print the time for this iteration
         toc(times, f"Iteration {data.it}")
         # Save the population to file
@@ -95,7 +96,7 @@ if settings.method == "jGA":
     res = GA(obj_func, bounds, constraints=constraints, xtol=settings.xtol, 
         it_max=settings.maxiter, pop_size=settings.pop_size, verbose=True,
         mutation1=settings.mutation1, mutation2=settings.mutation2, 
-        callback=GAcb, warm_start=warm_start)
+        anneal=settings.anneal, warm_start=warm_start, callback=GAcb)
     res.printall()
     # Tacky fix for compatability
     res.x = res.x_star

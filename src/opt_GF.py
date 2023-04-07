@@ -167,8 +167,8 @@ def tournament(population, popf, popg=None):
     return winners, parents
 
 def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol=1e-8, 
-    mutation1=0.05, mutation2=0.40, elitist=True, figax=None, verbose=False,
-    callback=None, warm_start=None):
+    mutation1=0.05, mutation2=0.40, elitist=True, anneal=False, figax=None,
+    verbose=False, callback=None, warm_start=None):
     """ Genetic Algorithm Optimization
 
     Sampling: LHS
@@ -196,6 +196,7 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol=1e-8,
         figas[1] = pyplot axis on that figure. The population will be displayed 
         on that figure using scatter.
     elitist (bool): Whether to forcibly keep the best point.
+    anneal (bool): Whether to employ simulated annealing. Based on it_max.
     verbose (bool): Whether to print a message every iteration.
     callback (function): A function to be called after every iteration.
     warm_start (dict): Warm start population. Dictionary with the following:
@@ -284,6 +285,16 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol=1e-8,
 
         ## Create next generation
         new_pop = np.zeros_like(population)
+        # Annealing: reduce mutation over time
+        if anneal:
+            # This way, the mutation coefficients go to zero at it = it_max,
+            #   though they never quite reach that because it++ at end.
+            T_scaling = (it_max-it)/(it_max)
+            mu1 = mutation1 * T_scaling
+            mu2 = mutation2 * T_scaling
+        else:
+            mu1 = mutation1
+            mu2 = mutation2
         for i_np in range(N_pop-1 if elitist else N_pop):
             # If elitist, leave the last entry in new_pop for the best from the 
             #   previous generation.
@@ -295,7 +306,7 @@ def GA(f, bounds, pop_size=15, constraints=(), it_max=100, xtol=1e-8,
             f0 = popf[couple[0]]
             f1 = popf[couple[1]]
             new_pop[i_np] = breed(p0, p1, f0, f1, fbest=fbest, 
-                mutation1=mutation1, mutation2=mutation2)
+                mutation1=mu1, mutation2=mu2)
         if elitist:
             # Not necessarily the same x as fbest from above
             xbest, *_ = find_best(population, popf, popg)
