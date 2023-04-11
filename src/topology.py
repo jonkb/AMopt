@@ -36,8 +36,11 @@ else:
     if pop_init.size == settings.nx:
         x0 = pop_init
     else:
+        # (popg must be 2d)
+        popg = (popg_init if (len(popg_init.shape) == 2) else 
+            popg_init.reshape(-1,1))
         # Pull out the best one to be x0
-        xbest, fbest, gbest, isfeasible = find_best(pop_init, popf_init, popg_init)
+        xbest, fbest, gbest, isfeasible = find_best(pop_init, popf_init, popg)
         print(f"The best member of the warm start population is: "
             f"\n\tBest x: {xbest}"
             f"\n\tBest f: {fbest}"
