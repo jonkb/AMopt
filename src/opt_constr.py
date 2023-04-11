@@ -5,6 +5,7 @@ Currently implemented: Interior penalty (logarithmic barrier)
 Jon Black, 2023-03-20
 """
 
+import settings
 import numpy as np
 import scipy.optimize as spo
 
@@ -30,7 +31,9 @@ def ip_min(f, g, x0, bounds=None, maxit=8, xtol=1e-3, rho=0.25, mu0=1):
     while it < maxit: # and dx > xtol:
         # Solve subproblem
         f_hat = lambda x: f_hat_ip(f, g, x, mu)
-        res = spo.minimize(f_hat, xi, bounds=bounds, tol=1e-2)
+        res = spo.minimize(f_hat, xi, bounds=bounds, tol=1e-2, options={
+            "eps": settings.FDeps
+        })
         it += 1
         print(f"Iteration {it}: \n{res}")
         # Set up for next iteration

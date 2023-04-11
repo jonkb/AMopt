@@ -40,6 +40,8 @@ maxiter = 8
 warm_pop = None #"population_init.txt"
 warm_popf = None #"popf_init.txt" # obj_fun(warm_pop)
 warm_popg = None #"popg_init.txt" # con_fun(warm_pop)
+# jIP options
+FDeps = 0.01 # finite-differencing epsilon
 ## GF options
 pop_size = 1 # N_pop = pop_size * N_x
 xtol = 1e-6
