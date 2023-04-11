@@ -6,6 +6,7 @@ from util import *
 from subprocess import run
 from scipy.optimize import (NonlinearConstraint, Bounds, minimize, 
     differential_evolution)
+from opt_GF import find_best, GA
 import numpy as np
 
 ## SETUP
@@ -22,7 +23,6 @@ if settings.warm_pop is None:
     warm_start = None
 else:
     pop_init = np.loadtxt(settings.warm_pop, dtype=float)
-    x0 = pop_init # For local methods
     popf_init = (np.loadtxt(settings.warm_popf, dtype=float) 
         if settings.warm_popf is not None else None)
     popg_init = (np.loadtxt(settings.warm_popg, dtype=float) 
@@ -32,6 +32,20 @@ else:
         "popf": popf_init,
         "popg": popg_init
     }
+    # For local methods
+    if pop_init.size == settings.nx:
+        x0 = pop_init
+    else:
+        # Pull out the best one to be x0
+        xbest, fbest, gbest, isfeasible = find_best(pop_init, popf_init, popg_init)
+        print(f"The best member of the warm start population is: "
+            f"\n\tBest x: {xbest}"
+            f"\n\tBest f: {fbest}"
+            f"\n\tBest g: {gbest}"
+            f" {'(feasible)' if isfeasible else '(not feasible)'}")
+        print("This point will be used as x0")
+        x0 = xbest
+
 
 # For SciPy methods
 theConstraints = NonlinearConstraint(con_func, -np.inf, 0.0)#, finite_diff_rel_step=[1e8])
@@ -76,7 +90,6 @@ if settings.method == "spDE":
 
 if settings.method == "jGA":
     ## Jon's GA
-    from opt_GF import GA
 
     def GAcb(data):
         # Delete unneeded temporary files after every iteration
