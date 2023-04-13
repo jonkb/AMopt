@@ -47,7 +47,7 @@ surface. Try running the example with different approximation orders and/or unif
 """
 from __future__ import absolute_import
 import numpy as nm
-from sfepy.base.base import output
+from sfepy.base.base import output, Struct
 # from sfepy.mechanics.matcoefs import stiffness_from_lame
 from sfepy.mechanics.matcoefs import stiffness_from_youngpoisson
 
@@ -172,6 +172,12 @@ def verify_tractions(out, problem, state, extend=False):
     eval_force('Top')
     eval_force('Bot')
 
+    # Out
+    # out['von_mises_stress'] = Struct(name='output_data', mode='cell',
+    #     data=von_mises_stress, dofs=None)
+    out['cauchy_stress'] = Struct(name='output_data', mode='cell',
+        data=stress, dofs=None)
+    
     return out
 
 def define(approx_order=1, tag="tmp"):
