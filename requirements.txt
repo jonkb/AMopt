@@ -3,6 +3,7 @@
 # TODO: IN PROGRESS
 
 numpy
+scipy
 numpy-stl
 scikit-image # For marching cubes algorithm
 sfepy # FEA

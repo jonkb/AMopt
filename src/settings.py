@@ -11,7 +11,7 @@ from subprocess import DEVNULL
 verbose = False
 terminal_output = DEVNULL
 # Whether to delete mesh files after every function call
-clean_up_each = True
+clean_up_each = False
 
 ## Limit multithreading (useful when running on a large, public computer)
 max_threads = "8"
@@ -25,7 +25,7 @@ os.environ["VECLIB_MAXIMUM_THREADS"] = max_threads
 os.environ["NUMEXPR_NUM_THREADS"] = max_threads
 
 # Whether to use legacy LHS package (pyDOE). Needed for Python 3.6
-legacy = True
+legacy = False
 
 # TODO: Temporary folder path
 
@@ -50,7 +50,7 @@ mutation1 = 0.10
 mutation2 = 0.40
 anneal = True
 # DE options
-polish = True
+polish = False
 
 ## Cube dimensions & Spacing
 #   See meshing.XYZ_grid() for density function XYZ grid generation
